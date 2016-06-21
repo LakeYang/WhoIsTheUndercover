@@ -1,0 +1,1 @@
+English language is written in PHP code. When PHP is unable to resolve this json, the original language English is used. So this file is just used to let PHP use English(or you can modify this to json to let the program show different things.)
