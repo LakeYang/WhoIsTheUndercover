@@ -5,4 +5,4 @@ dwsync.xml
 tz.php
 
 #ignore config.php when no more varibles need to be set
-config.php
+config/config.php
