@@ -3,6 +3,3 @@ dwsync.xml
 
 #Ignore file that used to check server's status and config
 tz.php
-
-#ignore config.php when no more varibles need to be set
-config.php
