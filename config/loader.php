@@ -19,7 +19,7 @@ function errorjump($errcode){
 	{
 	case 1:
 		//Cannot Connect to Database
-		header('Location: errorpages/database.php');
+		include dirname(__FILE__).'/errorpages/database.php';
 		exit;
 	case 2:
 		//Database processing error
@@ -31,6 +31,6 @@ function errorjump($errcode){
 }
 //Database Connection
 @$mysqli = new mysqli(HOSTNAME,DB_USERNAME,DB_PASSWORD,DB_NAME);
-//if(mysqli_connect_errno())errorjump(1);
+if(mysqli_connect_errno())errorjump(1);
 
 ?>
