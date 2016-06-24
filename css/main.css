@@ -1,0 +1,17 @@
+#top_ui {
+	text-align: center;
+	margin-top: 200px;
+}
+.loading_total {
+	width: 70%;
+	height: 15px;
+	background-color: rgba(141,141,141,1.00);
+	margin-left: auto;
+	margin-right: auto;
+
+}
+.loading_progress {
+	background-color: rgba(84,199,129,1);
+	height: 100%;
+	width: 50%;
+}

@@ -13,7 +13,7 @@ Licensed under the Apache License, Version 2.0
 -->
 <title><?php echo trans('Who is the undercover'); ?></title>
 <script src="js/libs/jquery-3.0.0.min.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main.js.php"></script>
 <?php 
 if(WechatEnabled){
 ?>
@@ -24,9 +24,19 @@ if(WechatEnabled){
 <script>
 var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
 </script>
+<link href="css/main.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
+<div id="top_ui">
+<span><?php echo trans('Loading...'); ?></span>
+<div class="loading_total">
+  <div class="loading_progress"></div>
+  <span><?php  ?></span>
+</div>
+
+</div>
+
 <?php 
 
 ?>
