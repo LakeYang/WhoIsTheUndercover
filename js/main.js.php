@@ -1,6 +1,5 @@
 <?php 
 include_once dirname(dirname(__FILE__)).'/config/loader.php';
-header('Cache-Control: max-age=43200');
 header('Content-Type: application/x-javascript');
 ?>
 /*

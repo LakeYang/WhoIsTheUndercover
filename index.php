@@ -13,6 +13,7 @@ Licensed under the Apache License, Version 2.0
 -->
 <title><?php echo trans('Who is the undercover'); ?></title>
 <script src="js/libs/jquery-3.0.0.min.js"></script>
+<script src="js/libs/preloadjs-0.6.2.min.js"></script>
 <script src="js/main.js.php"></script>
 <?php 
 if(WechatEnabled){
