@@ -7,7 +7,7 @@ include_once dirname(__FILE__).'/config/loader.php';
 <meta charset="utf-8">
 <!--
 This is an open-source web game by LakeYang
-GitHub Page: githut.com/LakeYang/WhoIsTheUndercover.git
+GitHub Page: github.com/LakeYang/WhoIsTheUndercover.git
 Copyright LakeYang(hihuyang.com) 2016
 Licensed under the Apache License, Version 2.0
 -->
