@@ -12,3 +12,15 @@ This Javascript include all custom function used, Seperated from main.js.php to 
 When the software release, two Javascript(actually PHP) files can be merged to reduce http requests to improve performance.
 */
 
+//User clicked enter, initiate canvas.
+function init(){
+	$("body").append('<canvas id="mainCanvas" height="'+$(window).height()+'px" width="'+$(window).width()+'px" style="position: absolute; left: 0px; top: 0px;"></canvas>');
+	stage = new createjs.Stage("mainCanvas");
+	background = new createjs.Shape();
+	background.alpha=0;
+	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, $(window).width(), $(window).height());
+	stage.addChild(background);
+	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){$("#top_ui").remove()});
+	createjs.Ticker.setFPS(30);
+	createjs.Ticker.addEventListener("tick", stage);
+}
