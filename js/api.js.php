@@ -16,11 +16,61 @@ When the software release, two Javascript(actually PHP) files can be merged to r
 function init(){
 	$("body").append('<canvas id="mainCanvas" height="'+$(window).height()+'px" width="'+$(window).width()+'px" style="position: absolute; left: 0px; top: 0px;"></canvas>');
 	stage = new createjs.Stage("mainCanvas");
+	createjs.Touch.enable(stage);
+	//Draw background that fade in
 	background = new createjs.Shape();
 	background.alpha=0;
 	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, $(window).width(), $(window).height());
 	stage.addChild(background);
-	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){$("#top_ui").remove()});
+	//top UI, container for calert() cconfirm(), etc.
+	top_ui = new createjs.Container();
+	stage.addChild(top_ui);
+	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){
+		$("#top_ui").remove();
+	});
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", stage);
+}
+
+//canvas alert function
+/*
+Usage:
+calert("Hello",function(){
+	//do something...
+	//this triggered when user clicked OK.
+})
+*/
+function calert(info,callbackFunction){
+	if(!calert.counter){
+		calert.counter = 0;
+		calert.alertlist=[];
+	}
+	calert.alertlist[calert.counter] = new createjs.Container();
+	top_ui.addChild(calert.alertlist[calert.counter]);
+	//Draw things here.
+	calert.counter++;
+	callbackFunction();
+}
+
+//canvas confirm function
+/*
+Usage:
+calert("Choose an option",function(status){
+	if(status){
+		//this triggered when user clicked OK.
+	}else{
+		//this triggered when user clicked Cancel.
+	}
+})
+*/
+function cconfirm(info,callbackFunction){
+	if(!cconfirm.counter){
+		cconfirm.counter = 0;
+		cconfirm.alertlist=[];
+	}
+	cconfirm.alertlist[cconfirm.counter] = new createjs.Container();
+	top_ui.addChild(cconfirm.alertlist[cconfirm.counter]);
+	//Draw things here.
+	cconfirm.counter++;
+	callbackFunction(1);
 }
