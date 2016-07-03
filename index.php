@@ -16,13 +16,6 @@ Licensed under the Apache License, Version 2.0
 <script src="js/libs/createjs-2015.11.26.min.js"></script>
 <script src="js/api.js.php"></script>
 <script src="js/main.js.php"></script>
-<?php 
-if(WechatEnabled){
-?>
-<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-<?php 
-}
-?>
 <script>
 var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
 </script>
@@ -34,9 +27,14 @@ var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
 <span><?php echo trans('Loading...'); ?></span>
 <div class="loading_total">
   <div class="loading_progress"></div>
-  <span><?php  ?></span>
 </div>
-
+<div id="ck-button">
+  <label>
+    <input type="checkbox" onClick="javascript:if(!this.checked){$('.if_sound_enabled').html('<?php echo trans('Sound enabled'); ?>');}else{$('.if_sound_enabled').html('<?php echo trans('Sound disabled'); ?>');};"><span class="if_sound_enabled"><?php echo trans('Sound enabled'); ?></span>
+  </label>
+</div>
+<br>
+<input onClick="init()" class="enter-btn" type="button" name="button" id="button" value="<?php echo trans('Enter anyway'); ?>">
 </div>
 
 <?php 
