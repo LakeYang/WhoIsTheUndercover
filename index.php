@@ -5,6 +5,7 @@ include_once dirname(__FILE__).'/config/loader.php';
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" />
 <!--
 This is an open-source web game by LakeYang
 GitHub Page: github.com/LakeYang/WhoIsTheUndercover.git
