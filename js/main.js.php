@@ -4,7 +4,7 @@ header('Content-Type: application/x-javascript');
 ?>
 /*
 This is an open-source web game by LakeYang
-GitHub Page: github.com/LakeYang/WhoIsTheUndercover.git
+GitHub Page: githun.com/LakeYang/WhoIsTheUndercover.git
 Copyright LakeYang(hihuyang.com) 2016
 Licensed under the Apache License, Version 2.0
 
