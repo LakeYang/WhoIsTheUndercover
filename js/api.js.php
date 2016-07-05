@@ -33,14 +33,7 @@ function init(){
 }
 
 //canvas alert function
-/*
-Usage:
-calert("Hello",function(){
-	//do something...
-	//this triggered when user clicked OK.
-})
-*/
-function calert(info,callbackFunction){
+function calert(info,callbackFunction,btntext="<?php echo trans('OK'); ?>"){
 	if(!calert.counter){
 		calert.counter = 0;
 		calert.alertlist=[];
@@ -53,17 +46,7 @@ function calert(info,callbackFunction){
 }
 
 //canvas confirm function
-/*
-Usage:
-calert("Choose an option",function(status){
-	if(status){
-		//this triggered when user clicked OK.
-	}else{
-		//this triggered when user clicked Cancel.
-	}
-})
-*/
-function cconfirm(info,callbackFunction){
+function cconfirm(info,callbackFunction,btnoktext="<?php echo trans('OK'); ?>",btncanceltext="<?php echo trans('Cancel'); ?>"){
 	if(!cconfirm.counter){
 		cconfirm.counter = 0;
 		cconfirm.alertlist=[];
