@@ -28,6 +28,7 @@ function init(){
 	stage.addChild(top_ui);
 	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){
 		$("#top_ui").remove();
+		calert("asdsa",function(){})
 	});
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", stage);
@@ -52,6 +53,18 @@ function calert(info,callbackFunction,btntext){
 	calert.alertlist[calert.counter] = new createjs.Container();
 	top_ui.addChild(calert.alertlist[calert.counter]);
 	//Draw things here.
+	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.75*0.773)/773;
+	var ctn_back = new createjs.Bitmap(queue.getResult("popup_background"));
+	calert.alertlist[calert.counter].addChild(ctn_back);
+	calert.alertlist[calert.counter].regX=386;
+	calert.alertlist[calert.counter].regY=500;
+	calert.alertlist[calert.counter].scaleY=calert.alertlist[calert.counter].scaleX = ctn_scale;
+	calert.alertlist[calert.counter].x=$(window).width()/2;
+	calert.alertlist[calert.counter].y=$(window).height()/2-60;
+	calert.alertlist[calert.counter].alpha=0;
+	play("paper1");
+	createjs.Tween.get(calert.alertlist[calert.counter]).to({alpha: 1,y:$(window).height()/2},500).call(function(){
+	});
 	calert.counter++;
 	callbackFunction();
 }
