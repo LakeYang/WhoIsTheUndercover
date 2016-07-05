@@ -19,6 +19,7 @@ Licensed under the Apache License, Version 2.0
 <script src="js/main.js.php"></script>
 <script>
 var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
+play.enabled=1;
 </script>
 <link href="css/main.css" rel="stylesheet" type="text/css">
 </head>
@@ -31,7 +32,7 @@ var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
 </div>
 <div id="ck-button">
   <label>
-    <input type="checkbox" onClick="javascript:if(!this.checked){$('.if_sound_enabled').html('<?php echo trans('Sound enabled'); ?>');}else{$('.if_sound_enabled').html('<?php echo trans('Sound disabled'); ?>');};"><span class="if_sound_enabled"><?php echo trans('Sound enabled'); ?></span>
+    <input id="soundswitch" type="checkbox" onClick="javascript:if(!this.checked){$('.if_sound_enabled').html('<?php echo trans('Sound enabled'); ?>');play.enabled=1;}else{$('.if_sound_enabled').html('<?php echo trans('Sound disabled'); ?>');play.enabled=0;};"><span class="if_sound_enabled"><?php echo trans('Sound enabled'); ?></span>
   </label>
 </div>
 <br>

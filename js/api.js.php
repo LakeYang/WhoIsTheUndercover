@@ -17,6 +17,7 @@ function init(){
 	$("body").append('<canvas id="mainCanvas" height="'+$(window).height()+'px" width="'+$(window).width()+'px" style="position: absolute; left: 0px; top: 0px;"></canvas>');
 	stage = new createjs.Stage("mainCanvas");
 	createjs.Touch.enable(stage);
+	play("sound_click");
 	//Draw background that fade in
 	background = new createjs.Shape();
 	background.alpha=0;
@@ -32,8 +33,18 @@ function init(){
 	createjs.Ticker.addEventListener("tick", stage);
 }
 
+//function used to play sound
+function play(sound_id){
+	if(play.enabled){
+		createjs.Sound.play(sound_id);
+	}
+}
+
 //canvas alert function
-function calert(info,callbackFunction,btntext="<?php echo trans('OK'); ?>"){
+function calert(info,callbackFunction,btntext){
+	if(!btntext){
+		btntext = "<?php echo trans('OK'); ?>";
+	}
 	if(!calert.counter){
 		calert.counter = 0;
 		calert.alertlist=[];
@@ -46,7 +57,13 @@ function calert(info,callbackFunction,btntext="<?php echo trans('OK'); ?>"){
 }
 
 //canvas confirm function
-function cconfirm(info,callbackFunction,btnoktext="<?php echo trans('OK'); ?>",btncanceltext="<?php echo trans('Cancel'); ?>"){
+function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
+	if(!btnoktext){
+		btnoktext = "<?php echo trans('OK'); ?>";
+	}
+	if(!btncanceltext){
+		btncanceltext = "<?php echo trans('Cancel'); ?>";
+	}
 	if(!cconfirm.counter){
 		cconfirm.counter = 0;
 		cconfirm.alertlist=[];

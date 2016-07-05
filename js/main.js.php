@@ -23,6 +23,7 @@ $(document).ready(function(){
 		$(".loading_progress").css("width",queue.progress*100+"%");
 	});
 	queue.loadManifest([
-		{id:"jweixin", src:"js/libs/jweixin-1.0.0.js"}
+		{id:"jweixin", src:"js/libs/jweixin-1.0.0.js"},
+		{id:"sound_click", src:"assets/audio/click.ogg"}
 	]);
 });
