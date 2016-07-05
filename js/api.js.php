@@ -28,7 +28,7 @@ function init(){
 	stage.addChild(top_ui);
 	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){
 		$("#top_ui").remove();
-		calert("asdsa",function(){})
+		calert("asdsa ahkjashdkj ashdkjad 伤不起真的伤不起爱双卡双待卡上的空间划收款机电话即可",function(){},"OK");
 	});
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", stage);
@@ -43,6 +43,9 @@ function play(sound_id){
 
 //canvas alert function
 function calert(info,callbackFunction,btntext){
+	if(!callbackFunction){
+		callbackFunction=function(){};
+	}
 	if(!btntext){
 		btntext = "<?php echo trans('OK'); ?>";
 	}
@@ -56,6 +59,36 @@ function calert(info,callbackFunction,btntext){
 	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.75*0.773)/773;
 	var ctn_back = new createjs.Bitmap(queue.getResult("popup_background"));
 	calert.alertlist[calert.counter].addChild(ctn_back);
+	var show_text = new createjs.Text(info, "80px Arial", "black");
+	show_text.x = 387;
+	show_text.y = 200;
+	show_text.maxWidth=show_text.lineWidth=463;
+	show_text.textBaseline = "hanging";
+	show_text.textAlign = "center";
+	calert.alertlist[calert.counter].addChild(show_text);
+	var ok_btn = new createjs.Container();
+	calert.alertlist[calert.counter].addChild(ok_btn);
+	var ok_btn_shape = new createjs.Shape();
+	ok_btn_shape.graphics.beginFill("#965632").drawRoundRect(70,50,450,160,25);
+	ok_btn.addChild(ok_btn_shape);
+	var ok_btn_stamp = new createjs.Bitmap(queue.getResult("blue_stamp"));
+	ok_btn.addChild(ok_btn_stamp);
+	var ok_btn_text = new createjs.Text(btntext, "130px Arial", "white");
+	ok_btn_text.x = 200;
+	ok_btn_text.y = 130;
+	ok_btn_text.textBaseline = "middle";
+	ok_btn.scaleY=ok_btn.scaleX=0.8;
+	ok_btn.regX = 295;
+	ok_btn.y = 700;
+	ok_btn.x = 386;
+	ok_btn.addChild(ok_btn_text);
+	ok_btn.addEventListener("click", function(evt) {
+		play("paper2");
+		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+			top_ui.removeChild(evt.target.parent.parent);
+		});
+		evt.remove();
+    });
 	calert.alertlist[calert.counter].regX=386;
 	calert.alertlist[calert.counter].regY=500;
 	calert.alertlist[calert.counter].scaleY=calert.alertlist[calert.counter].scaleX = ctn_scale;
