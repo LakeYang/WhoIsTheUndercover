@@ -28,7 +28,7 @@ function init(){
 	stage.addChild(top_ui);
 	createjs.Tween.get(background).to({alpha: 1}, 1000).call(function(){
 		$("#top_ui").remove();
-		modeselect("asdsa ahkjashdkj ashdkjadfdsafdsafdafdafdasfdfdsfadsfdsafdaf 伤不起真的伤不起爱双卡双待卡上的空间划收款机电话即可",function(){});
+		modeselect();
 	});
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", stage);
@@ -103,16 +103,11 @@ function calert(info,callbackFunction,btntext){
 }
 
 //canvas confirm function
-function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
-	if(!btnoktext){
+function cconfirm(){
 		btnoktext = "<?php echo trans('OK'); ?>";
-	}
-	if(!btncanceltext){
 		btncanceltext = "<?php echo trans('Cancel'); ?>";
-	}
 	if(!cconfirm.counter){
 		cconfirm.counter = 0;
-		cconfirm.alertlist=[];
 	}
 	cconfirm.alertlist[cconfirm.counter] = new createjs.Container();
 	top_ui.addChild(cconfirm.alertlist[cconfirm.counter]);
@@ -122,44 +117,42 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 }
 
 //canvas modeselect function
-function modeselect(info,callbackFunction,btnsingletext,btnnetworktext){
-	if(!btnsingletext){
+function modeselect(){
 		btnsingletext = "<?php echo trans('Single'); ?>";
-	}
-	if(!btnnetworktext){
 		btnnetworktext = "<?php echo trans('Network'); ?>";
-	}
+		info = "<?php echo trans('Rules'); ?>";
 	if(!modeselect.counter){
 		modeselect.counter = 0;
-		modeselect.alertlist=[];
 	}
-	modeselect.alertlist[modeselect.counter] = new createjs.Container();
-	top_ui.addChild(modeselect.alertlist[modeselect.counter]);
+	ms_background = new createjs.Container();
+	top_ui.addChild(ms_background);
 	//Draw background here.
 	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
-	modeselect.alertlist[modeselect.counter].addChild(ctn_back);
-	modeselect.alertlist[modeselect.counter].regX=180;
-	modeselect.alertlist[modeselect.counter].regY=320;
-	modeselect.alertlist[modeselect.counter].scaleX = $(window).width()/360;
-	modeselect.alertlist[modeselect.counter].scaleY = $(window).height()/640;
-	modeselect.alertlist[modeselect.counter].x=$(window).width()/2;
-	modeselect.alertlist[modeselect.counter].y=$(window).height()/2;
-	modeselect.alertlist[modeselect.counter].alpha=0;
-	createjs.Tween.get(modeselect.alertlist[modeselect.counter]).to({alpha: 1},500).call(function(){
+	ms_background.addChild(ctn_back);
+	ms_background.regX=180;
+	ms_background.regY=320;
+	ms_background.scaleX = $(window).width()/360;
+	ms_background.scaleY = $(window).height()/640;
+	ms_background.x=$(window).width()/2;
+	ms_background.y=$(window).height()/2;
+	ms_background.alpha=0;
+	createjs.Tween.get(ms_background).to({alpha: 1},500).call(function(){
 	});
 	rules = new createjs.Container();
 	top_ui.addChild(rules);
 	//Draw rules here.
 	var rules_brand = new createjs.Bitmap(queue.getResult("wood_brand"));
-	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.8)/500;
+	var ctn_scalex = $(window).width()/500;
+	var ctn_scaley = $(window).height()*0.8/500;
 	rules.addChild(rules_brand);
 	rules.regX=250;
 	rules.regY=250;
 	rules.x=$(window).width()/2;
-	rules.y=-500*ctn_scale/2;
-	rules.scaleX = rules.scaleY = ctn_scale;
+	rules.y=-500*ctn_scaley/2;
+	rules.scaleX = ctn_scalex;
+	rules.scaleY = ctn_scaley;
 	rules.alpha=0;
-	createjs.Tween.get(rules).to({alpha: 1,y:500*ctn_scale/2},500).to({y:460*ctn_scale/2},200).to({y:500*ctn_scale/2},250).call(function(){
+	createjs.Tween.get(rules).to({alpha: 1,y:500*ctn_scaley/2},500).to({y:460*ctn_scaley/2},200).to({y:500*ctn_scaley/2},250).call(function(){
 	});
 	var rules_text = new createjs.Text(info, "30px Arial", "black");
 	rules.addChild(rules_text);
@@ -175,15 +168,15 @@ function modeselect(info,callbackFunction,btnsingletext,btnnetworktext){
 	single_btn_shape.graphics.beginFill("rgba(225,145,51,0.3)").drawRoundRect(0,-13,200,90,25);
 	single_btn.addChild(single_btn_shape);
 	var single_btn_scale = Math.min($(window).width()*0.8,$(window).height()*0.8)/400;
-	single_btn.regX=200;
-	single_btn.regY=90;
-	single_btn.x=$(window).width()/2;
-	single_btn.y=$(window).height()/10*9;
+	single_btn.regX=90;
+	single_btn.regY=45;
+	single_btn.x=$(window).width()/4;
+	single_btn.y=$(window).height()/7*6;
 	single_btn.scaleX = single_btn.scaleY = single_btn_scale ;
 	var single_btn_text = new createjs.Text(btnsingletext, "50px Arial", "white");
 	single_btn.addChild(single_btn_text);
 	single_btn.addEventListener("click", function(evt) {
-		play("paper2");
+		play("sound_click");
 		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
 		top_ui.removeChild(evt.target.parent.parent);
 		});
@@ -194,20 +187,18 @@ function modeselect(info,callbackFunction,btnsingletext,btnnetworktext){
 	network_btn_shape.graphics.beginFill("rgba(24,161,95,0.5)").drawRoundRect(0,-13,200,90,25);
 	network_btn.addChild(network_btn_shape);
 	var network_btn_scale = Math.min($(window).width()*0.8,$(window).height()*0.8)/400;
-	network_btn.regX=200;
-	network_btn.regY=90;
-	network_btn.x=$(window).width()/4*2.9;
-	network_btn.y=$(window).height()/10*9;
+	network_btn.regX=110;
+	network_btn.regY=45;
+	network_btn.x=$(window).width()/4*3;
+	network_btn.y=$(window).height()/7*6;
 	network_btn.scaleX = network_btn.scaleY = network_btn_scale ;
 	var network_btn_text = new createjs.Text(btnnetworktext, "50px Arial", "white");
 	network_btn.addChild(network_btn_text);
 	network_btn.addEventListener("click", function(evt) {
-		play("paper2");
+		play("sound_click");
 		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
 		top_ui.removeChild(evt.target.parent.parent);
 		});
     });
 	modeselect.counter++;
-	callbackFunction();
-	
 }
