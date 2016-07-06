@@ -23,6 +23,12 @@ function init(){
 	background.alpha=0;
 	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, $(window).width(), $(window).height());
 	stage.addChild(background);
+	//ui container for main page
+	main_ui = new createjs.Container();
+	stage.addChild(main_ui);
+	//ui container for the first mode page
+	mode_ui = new createjs.Container();
+	stage.addChild(mode_ui);
 	//top UI, container for calert() cconfirm(), etc.
 	top_ui = new createjs.Container();
 	stage.addChild(top_ui);
@@ -201,7 +207,7 @@ function modeselect(){
 		modeselect.counter = 0;
 	}
 	ms_background = new createjs.Container();
-	top_ui.addChild(ms_background);
+	main_ui.addChild(ms_background);
 	//Draw background here.
 	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
 	ms_background.addChild(ctn_back);
@@ -215,7 +221,7 @@ function modeselect(){
 	createjs.Tween.get(ms_background).to({alpha: 1},500).call(function(){
 	});
 	rules = new createjs.Container();
-	top_ui.addChild(rules);
+	main_ui.addChild(rules);
 	//Draw rules here.
 	var rules_brand = new createjs.Bitmap(queue.getResult("wood_brand"));
 	var ctn_scalex = $(window).width()/500;
@@ -232,9 +238,9 @@ function modeselect(){
 		calert("hello",function(){
 			cconfirm("xx",function(s){
 				if(s){
-					alert("t")
+					//alert("t")
 				}else{
-					alert("f")
+					//alert("f")
 				}
 			},"dasdsadas","adsadsadsa")
 		})
@@ -248,7 +254,7 @@ function modeselect(){
 	rules_text.textAlign = "center";
 	//Draw buttons here.
 	var single_btn = new createjs.Container();
-	top_ui.addChild(single_btn);
+	main_ui.addChild(single_btn);
 	var single_btn_shape = new createjs.Shape();
 	single_btn_shape.graphics.beginFill("rgba(225,145,51,0.3)").drawRoundRect(0,-13,200,90,25);
 	single_btn.addChild(single_btn_shape);
@@ -262,12 +268,10 @@ function modeselect(){
 	single_btn.addChild(single_btn_text);
 	single_btn.addEventListener("click", function(evt) {
 		play("sound_click");
-		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
-			top_ui.removeChild(evt.target.parent.parent);
-		});
+		singlemode();
     });
 	var network_btn = new createjs.Container();
-	top_ui.addChild(network_btn);
+	main_ui.addChild(network_btn);
 	var network_btn_shape = new createjs.Shape();
 	network_btn_shape.graphics.beginFill("rgba(24,161,95,0.5)").drawRoundRect(0,-13,200,90,25);
 	network_btn.addChild(network_btn_shape);
@@ -281,9 +285,32 @@ function modeselect(){
 	network_btn.addChild(network_btn_text);
 	network_btn.addEventListener("click", function(evt) {
 		play("sound_click");
-		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
-			top_ui.removeChild(evt.target.parent.parent);
-		});
+		networkmode();
     });
 	modeselect.counter++;
+}
+
+//Single mode main setting page
+function singlemode(){
+	//Draw a transparent mask on main_ui and give it click listener to block intractive from expired ui content
+	var main_block = new createjs.Shape();
+	main_block.alpha = 0;
+	main_block.graphics.beginFill("black").drawRect(0, 0, $(window).width(), $(window).height());
+	main_ui.addChild(main_block);
+	main_block.addEventListener("click",function(){/*This is a blackhole*/});
+	//Draw single mode ui here
+	
+	//ui animation
+	mode_ui.x = $(window).width();
+	createjs.Tween.get(main_ui).to({x:-$(window).width()},500);
+	createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
+		main_ui.removeAllChildren();
+		main_ui.x = 0;
+		calert("Done",0);
+	});
+}
+
+//Network mode main setting page
+function networkmode(){
+	calert("Developing,please wait..",0);
 }
