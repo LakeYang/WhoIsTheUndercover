@@ -27,6 +27,8 @@ $(document).ready(function(){
 		{id:"popup_background", src:"assets/image/old_scroll.png"},
 		{id:"red_stamp", src:"assets/image/red_wax_stamp.png"},
 		{id:"blue_stamp", src:"assets/image/blue_wax_stamp.png"},
+		{id:"modeselect_background", src:"assets/image/modeselect_bg.png"},
+		{id:"wood_brand", src:"assets/image/rules.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
 		{id:"sound_click", src:"assets/audio/click.ogg"}
