@@ -76,6 +76,7 @@ function calert(info,callbackFunction,btntext){
 	var ok_btn_text = new createjs.Text(btntext, "130px Arial", "white");
 	ok_btn_text.x = 200;
 	ok_btn_text.y = 130;
+	ok_btn_text.maxWidth = 320;
 	ok_btn_text.textBaseline = "middle";
 	ok_btn.scaleY=ok_btn.scaleX=0.8;
 	ok_btn.regX = 295;
@@ -83,6 +84,7 @@ function calert(info,callbackFunction,btntext){
 	ok_btn.x = 386;
 	ok_btn.addChild(ok_btn_text);
 	ok_btn.addEventListener("click", function(evt) {
+		callbackFunction();
 		play("paper2");
 		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
@@ -99,21 +101,95 @@ function calert(info,callbackFunction,btntext){
 	createjs.Tween.get(calert.alertlist[calert.counter]).to({alpha: 1,y:$(window).height()/2},500).call(function(){
 	});
 	calert.counter++;
-	callbackFunction();
 }
 
 //canvas confirm function
-function cconfirm(){
+function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
+	if(!btnoktext){
 		btnoktext = "<?php echo trans('OK'); ?>";
+	}
+	if(!btncanceltext){
 		btncanceltext = "<?php echo trans('Cancel'); ?>";
+	}
 	if(!cconfirm.counter){
 		cconfirm.counter = 0;
+		cconfirm.alertlist=[];
 	}
 	cconfirm.alertlist[cconfirm.counter] = new createjs.Container();
 	top_ui.addChild(cconfirm.alertlist[cconfirm.counter]);
 	//Draw things here.
+	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.75*0.773)/773;
+	var ctn_back = new createjs.Bitmap(queue.getResult("popup_background"));
+	cconfirm.alertlist[cconfirm.counter].addChild(ctn_back);
+	var show_text = new createjs.Text(info, "80px Arial", "black");
+	show_text.x = 387;
+	show_text.y = 200;
+	show_text.maxWidth=show_text.lineWidth=463;
+	show_text.textBaseline = "hanging";
+	show_text.textAlign = "center";
+	cconfirm.alertlist[cconfirm.counter].addChild(show_text);
+	var ok_btn = new createjs.Container();
+	cconfirm.alertlist[cconfirm.counter].addChild(ok_btn);
+	var ok_btn_shape = new createjs.Shape();
+	ok_btn_shape.graphics.beginFill("#965632").drawRoundRect(70,50,450,160,25);
+	ok_btn.addChild(ok_btn_shape);
+	var ok_btn_stamp = new createjs.Bitmap(queue.getResult("blue_stamp"));
+	ok_btn.addChild(ok_btn_stamp);
+	var ok_btn_text = new createjs.Text(btnoktext, "130px Arial", "white");
+	ok_btn_text.x = 200;
+	ok_btn_text.y = 130;
+	ok_btn_text.maxWidth = 320;
+	ok_btn_text.textBaseline = "middle";
+	ok_btn.scaleY=ok_btn.scaleX=0.6;
+	ok_btn.regX = 295;
+	ok_btn.y = 700;
+	ok_btn.x = 225;
+	ok_btn.addChild(ok_btn_text);
+	ok_btn.addEventListener("click", function(evt) {
+		callbackFunction(1);
+		play("paper2");
+		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+			top_ui.removeChild(evt.target.parent.parent);
+		});
+		evt.remove();
+    });
+	
+	var cancel_btn = new createjs.Container();
+	cconfirm.alertlist[cconfirm.counter].addChild(cancel_btn);
+	var cancel_btn_shape = new createjs.Shape();
+	cancel_btn_shape.graphics.beginFill("#965632").drawRoundRect(70,50,450,160,25);
+	cancel_btn.addChild(cancel_btn_shape);
+	var cancel_btn_stamp = new createjs.Bitmap(queue.getResult("red_stamp"));
+	cancel_btn.addChild(cancel_btn_stamp);
+	var cancel_btn_text = new createjs.Text(btncanceltext, "130px Arial", "white");
+	cancel_btn_text.x = 200;
+	cancel_btn_text.y = 130;
+	cancel_btn_text.maxWidth = 320;
+	cancel_btn_text.textBaseline = "middle";
+	cancel_btn.scaleY=cancel_btn.scaleX=0.6;
+	cancel_btn.regX = 295;
+	cancel_btn.y = 700;
+	cancel_btn.x = 568;
+	cancel_btn.addChild(cancel_btn_text);
+	cancel_btn.addEventListener("click", function(evt) {
+		callbackFunction(0);
+		play("paper2");
+		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+			top_ui.removeChild(evt.target.parent.parent);
+		});
+		evt.remove();
+    });
+	
+	cconfirm.alertlist[cconfirm.counter].regX=386;
+	cconfirm.alertlist[cconfirm.counter].regY=500;
+	cconfirm.alertlist[cconfirm.counter].scaleY=cconfirm.alertlist[cconfirm.counter].scaleX = ctn_scale;
+	cconfirm.alertlist[cconfirm.counter].x=$(window).width()/2;
+	cconfirm.alertlist[cconfirm.counter].y=$(window).height()/2-60;
+	cconfirm.alertlist[cconfirm.counter].alpha=0;
+	play("paper1");
+	createjs.Tween.get(cconfirm.alertlist[cconfirm.counter]).to({alpha: 1,y:$(window).height()/2},500).call(function(){
+	});
 	cconfirm.counter++;
-	callbackFunction(1);
 }
 
 //canvas modeselect function
@@ -153,6 +229,15 @@ function modeselect(){
 	rules.scaleY = ctn_scaley;
 	rules.alpha=0;
 	createjs.Tween.get(rules).to({alpha: 1,y:500*ctn_scaley/2},500).to({y:460*ctn_scaley/2},200).to({y:500*ctn_scaley/2},250).call(function(){
+		calert("hello",function(){
+			cconfirm("xx",function(s){
+				if(s){
+					alert("t")
+				}else{
+					alert("f")
+				}
+			},"dasdsadas","adsadsadsa")
+		})
 	});
 	var rules_text = new createjs.Text(info, "30px Arial", "black");
 	rules.addChild(rules_text);
@@ -178,7 +263,7 @@ function modeselect(){
 	single_btn.addEventListener("click", function(evt) {
 		play("sound_click");
 		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
-		top_ui.removeChild(evt.target.parent.parent);
+			top_ui.removeChild(evt.target.parent.parent);
 		});
     });
 	var network_btn = new createjs.Container();
@@ -197,7 +282,7 @@ function modeselect(){
 	network_btn.addEventListener("click", function(evt) {
 		play("sound_click");
 		createjs.Tween.get(evt.target.parent.parent).to({alpha:0},500).call(function(){
-		top_ui.removeChild(evt.target.parent.parent);
+			top_ui.removeChild(evt.target.parent.parent);
 		});
     });
 	modeselect.counter++;
