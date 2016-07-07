@@ -2,6 +2,7 @@
 define("APPID","WeChatAppid");
 define("TOKEN","WeChatToken");
 define("SECRET","WeChatSecret");
+define("IndexURL","URL for index.php(For wechat use)");
 define("HOSTNAME","localhost");
 define("DB_USERNAME","game_user");
 define("DB_PASSWORD","123456");
