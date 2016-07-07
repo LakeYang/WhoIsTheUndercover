@@ -314,3 +314,25 @@ function singlemode(){
 function networkmode(){
 	calert("Developing,please wait..",0);
 }
+
+//Single mode game start
+function singlestart(player_num,spy_num,white_num,wordtype){
+	
+}
+
+//Universal function to get user's head portrait
+function getlogo(callbackFunction){
+	<?php 
+	if(WechatEnabled){
+	?>
+	//Script to execute if WechatEnabled
+	
+	<?php 
+	}else{
+	?>
+	//Script to execute if WechatDisabled
+	
+	<?php 
+	}
+	?>
+}

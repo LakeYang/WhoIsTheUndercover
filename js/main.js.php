@@ -16,6 +16,17 @@ $(document).ready(function(){
 	queue = new createjs.LoadQueue();
 	queue.installPlugin(createjs.Sound);
 	queue.on("complete",function(){
+		wx.config({
+			debug: true,
+			appId: '<?php echo APPID; ?>',
+			timestamp: <?php echo $timestamp; ?>,
+			nonceStr: '<?php echo $str; ?>', 
+			signature: '<?php echo $signature; ?>',
+			jsApiList: ['chooseImage']
+		});
+		wx.ready(function(){
+			alert("Complete",0);
+		});
 		$(".enter-btn").css("background","#3498db");
 		$(".enter-btn").val("<?php echo trans('Enter'); ?>");
 	}, this);
