@@ -29,6 +29,9 @@ function init(){
 	//ui container for the first mode page
 	mode_ui = new createjs.Container();
 	stage.addChild(mode_ui);
+	//UI FOR GAME
+	game_ui = new createjs.Container();
+	stage.addChild(game_ui);
 	//top UI, container for calert() cconfirm(), etc.
 	top_ui = new createjs.Container();
 	stage.addChild(top_ui);
@@ -306,7 +309,9 @@ function singlemode(){
 	createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
 		main_ui.x = 0;
-		calert("Done",0);
+		calert("Done",function(){
+			singlestart(3,1,0,0,1);
+		});
 	});
 }
 
@@ -316,8 +321,48 @@ function networkmode(){
 }
 
 //Single mode game start
-function singlestart(player_num,spy_num,white_num,wordtype){
+function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
+	//block first
+	var main_block = new createjs.Shape();
+	main_block.alpha = 0;
+	main_block.graphics.beginFill("black").drawRect(0, 0, $(window).width(), $(window).height());
+	mode_ui.addChild(main_block);
+	main_block.addEventListener("click",function(){/*This is a blackhole*/});
+	//Animation first
+	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
+	ctn_back.scaleX = $(window).width()/360;
+	ctn_back.scaleY = $(window).height()/640;
+	game_ui.addChild(ctn_back);
 	
+	game_ui.x = $(window).width();
+	createjs.Tween.get(mode_ui).to({x:-$(window).width()},500);
+	createjs.Tween.get(game_ui).to({x:0},500).call(function(){
+		mode_ui.removeAllChildren();
+		mode_ui.x = 0;
+		//Start distribute card and take photos
+		takephotos(player_num,function(){
+			alert("d");
+		});
+	});
+	
+}
+
+//function used in singlestart() used to take photo.
+function takephotos(num,callbackFunction,nownum,lastarray){
+	if(!nownum){
+		nownum = 1;
+		lastarray=[];
+	}
+	if(nownum<=num){
+		calert("<?php echo trans('Player %1 ,It is your turn to take a photo now.'); ?>".replace(/%1/,nownum),function(){
+			getlogo(function(res){
+				lastarray[nownum] = res;
+				takephotos(num,callbackFunction,nownum+1,lastarray);
+			})
+		});
+	}else{
+		callbackFunction(lastarray);
+	}
 }
 
 //Universal function to get user's head portrait
@@ -326,7 +371,17 @@ function getlogo(callbackFunction){
 	if(WechatEnabled){
 	?>
 	//Script to execute if WechatEnabled
-	
+	wx.chooseImage({
+		count: 1,
+		sizeType: ['original', 'compressed'],
+		sourceType: ['album', 'camera'],
+		success: function(res){
+			callbackFunction(res.localIds);
+		},
+		cancel: function(){
+			callbackFunction("");
+		}
+	});
 	<?php 
 	}else{
 	?>
