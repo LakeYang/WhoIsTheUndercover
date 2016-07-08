@@ -8,9 +8,52 @@ GitHub Page: github.com/LakeYang/WhoIsTheUndercover.git
 Copyright LakeYang(hihuyang.com) 2016
 Licensed under the Apache License, Version 2.0
 
-This Javascript include all custom function used, Seperated from main.js.php to make it easy for development.
-When the software release, two Javascript(actually PHP) files can be merged to reduce http requests to improve performance.
+This Javascript control all the user intractive and object drawings.
+The index.php just show a loading progress bar, then all the thing is send to this Javascript to process.
+Note because this application is multi-language, so language is injected to this via php.
 */
+
+$(document).ready(function(){
+	queue = new createjs.LoadQueue();
+	queue.installPlugin(createjs.Sound);
+	queue.on("complete",function(){
+<?php if(WechatEnabled){ ?>
+		wx.config({
+			debug: false,
+			appId: '<?php echo APPID; ?>',
+			timestamp: <?php echo $timestamp; ?>,
+			nonceStr: '<?php echo $str; ?>', 
+			signature: '<?php echo $signature; ?>',
+			jsApiList: ['chooseImage']
+		});
+		wx.ready(function(){
+			//
+		});
+		wx.error(function(res){
+			alert("WeChat Auth Failed"+res);
+		});
+<?php } ?>
+		$(".enter-btn").css("background","#3498db");
+		$(".enter-btn").val("<?php echo trans('Enter'); ?>");
+	}, this);
+	queue.on("progress", function(){
+		$(".loading_progress").css("width",queue.progress*100+"%");
+	});
+	queue.loadManifest([
+<?php if(WechatEnabled){ ?>
+		{id:"jweixin", src:"js/libs/jweixin-1.0.0.js"},
+<?php } ?>
+		{id:"popup_background", src:"assets/image/old_scroll.png"},
+		{id:"red_stamp", src:"assets/image/red_wax_stamp.png"},
+		{id:"blue_stamp", src:"assets/image/blue_wax_stamp.png"},
+		{id:"modeselect_background", src:"assets/image/modeselect_bg.png"},
+		{id:"wood_brand", src:"assets/image/rules.png"},
+		{id:"paper1", src:"assets/audio/paper1.mp3"},
+		{id:"paper2", src:"assets/audio/paper2.mp3"},
+		{id:"sound_click", src:"assets/audio/click.ogg"}
+	]);
+});
+
 
 //User clicked enter, initiate canvas.
 function init(){
@@ -238,14 +281,8 @@ function modeselect(){
 	rules.scaleY = ctn_scaley;
 	rules.alpha=0;
 	createjs.Tween.get(rules).to({alpha: 1,y:500*ctn_scaley/2},500).to({y:460*ctn_scaley/2},200).to({y:500*ctn_scaley/2},250).call(function(){
-		calert("hello",function(){
-			cconfirm("xx",function(s){
-				if(s){
-					//alert("t")
-				}else{
-					//alert("f")
-				}
-			},"dasdsadas","adsadsadsa")
+		calert("Hello, "+user_nickname+" Welcome to the world of undercovers",function(){
+			
 		})
 	});
 	var rules_text = new createjs.Text(info, "30px Arial", "black");
@@ -380,7 +417,10 @@ function getlogo(callbackFunction){
 		},
 		cancel: function(){
 			callbackFunction("");
-		}
+		},
+		fail: function(){
+			callbackFunction("");
+		},
 	});
 	<?php 
 	}else{

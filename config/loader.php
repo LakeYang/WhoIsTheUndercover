@@ -8,6 +8,13 @@ if((@$langfile = file_get_contents(dirname(dirname(__FILE__)).'/languages/'.$lan
 }
 $langarray = json_decode($langfile, true) or $langarray = array();
 unset($langfile);
+//Get url for this page
+if(isset($_GET['url'])){
+	$url=$_GET['url'];
+}else{
+	$HTTP_SCHEME = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
+	$url = urlencode($HTTP_SCHEME.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+}
 //Translation function
 function trans($transtext){
 	if(isset($GLOBALS['langarray'][$transtext]))return $GLOBALS['langarray'][$transtext];
@@ -80,13 +87,8 @@ if(WechatEnabled){
 		errorjump(2,'Error occured when getting data from database'.TABLE_PREFIX.'_AuthToken');
 	}
 	//Generate Signature
-	/*
-	//The following code is used for setup,useless for now.
-	$HTTP_SCHEME = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-$url = $HTTP_SCHEME.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-	*/
 	$timestamp = time();
-	$signature = "jsapi_ticket=$JsapiTicket&noncestr=$str&timestamp=$timestamp&url=".IndexURL;
+	$signature = "jsapi_ticket=$JsapiTicket&noncestr=$str&timestamp=$timestamp&url=".$url;
 	$signature = sha1($signature);
 }
 

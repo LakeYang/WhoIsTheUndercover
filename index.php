@@ -1,5 +1,31 @@
 <?php 
 include_once dirname(__FILE__).'/config/loader.php';
+$HTTP_SCHEME = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
+$SignHost = $_SERVER['HTTP_HOST'];
+if(CutPort){
+	$SignHost = explode(":",$SignHost);
+	$SignHost = $SignHost[0];
+}
+$url = urlencode($HTTP_SCHEME.$SignHost.$_SERVER['REQUEST_URI']);
+if(isset($_GET['code']) && WechatEnabled){
+	$json = file_get_contents("https://api.weixin.qq.com/sns/oauth2/access_token?appid=".APPID."&secret=".SECRET."&code=".urlencode($_GET['code'])."&grant_type=authorization_code");
+	$WebAccessTokenRespond = json_decode($json, true);
+	$WebAccessToken = $WebAccessTokenRespond['access_token'];
+	$UserOpenID = $WebAccessTokenRespond['openid'];
+	$json = file_get_contents("https://api.weixin.qq.com/sns/userinfo?access_token=$WebAccessToken&openid=$UserOpenID&lang=zh_CN");
+	$UserInfo = json_decode($json, true);
+	$UserName = $UserInfo['nickname'];
+	$UserImg = $UserInfo['headimgurl'];
+	if(!(isset($UserInfo['nickname']) && $UserInfo['nickname']!="")){
+		$UserName = "UNSET";
+	}
+	if(!(isset($UserInfo['headimgurl']) && $UserInfo['headimgurl']!="")){
+		$UserImg = "UNSET";
+	}
+}else if(WechatEnabled){
+	header('Location: https://open.weixin.qq.com/connect/oauth2/authorize?appid='.APPID.'&redirect_uri='.$url.'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect');//&state=STATE
+	exit;
+}
 ?>
 <!doctype html>
 <html>
@@ -15,11 +41,17 @@ Licensed under the Apache License, Version 2.0
 <title><?php echo trans('Who is the undercover'); ?></title>
 <script src="js/libs/jquery-3.0.0.min.js"></script>
 <script src="js/libs/createjs-2015.11.26.min.js"></script>
-<script src="js/api.js.php"></script>
-<script src="js/main.js.php"></script>
+<script src="js/api.js.php?url=<?php echo $url; ?>"></script>
 <script>
-var WechatEnabled=<?php if(WechatEnabled)echo 1;else echo 0; ?>;
-play.enabled=1;
+play.enabled = 1;
+<?php 
+if(WechatEnabled){
+?>
+user_nickname = "<?php echo $UserName; ?>";
+user_headimg = "<?php echo $UserImg; ?>";
+<?php 
+}
+?>
 </script>
 <link href="css/main.css" rel="stylesheet" type="text/css">
 </head>
