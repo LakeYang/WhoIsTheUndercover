@@ -15,6 +15,7 @@ Note because this application is multi-language, so language is injected to this
 
 $(document).ready(function(){
 	queue = new createjs.LoadQueue();
+	headimgquery = new createjs.LoadQueue(false);
 	queue.installPlugin(createjs.Sound);
 	queue.on("complete",function(){
 <?php if(WechatEnabled){ ?>
@@ -194,7 +195,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	ok_btn_text.textBaseline = "middle";
 	ok_btn.scaleY=ok_btn.scaleX=0.6;
 	ok_btn.regX = 295;
-	ok_btn.y = 700;
+	ok_btn.y = 750;
 	ok_btn.x = 225;
 	ok_btn.addChild(ok_btn_text);
 	ok_btn.addEventListener("click", function(evt) {
@@ -220,7 +221,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cancel_btn_text.textBaseline = "middle";
 	cancel_btn.scaleY=cancel_btn.scaleX=0.6;
 	cancel_btn.regX = 295;
-	cancel_btn.y = 700;
+	cancel_btn.y = 750;
 	cancel_btn.x = 568;
 	cancel_btn.addChild(cancel_btn_text);
 	cancel_btn.addEventListener("click", function(evt) {
@@ -377,8 +378,92 @@ function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
 		mode_ui.removeAllChildren();
 		mode_ui.x = 0;
 		//Start distribute card and take photos
-		takephotos(player_num,function(){
-			alert("d");
+		takephotos(player_num,function(photoarray){
+			if($(window).width()<=$(window).height()*0.76875){
+				var card_height = $(window).width()*4/17;
+			}else{
+				var card_height = $(window).height()/4;
+			}			
+			var card_interspace_x = ($(window).width()-3*card_height)/5;
+			var card_interspace_y = ($(window).height()*0.75-3*card_height)/4;
+			var row_num = Math.ceil(player_num/4);
+			var ypos_list = [];
+			if(row_num == 1){
+				ypos_list[0] = $(window).height()*0.375-card_height/2;
+			}else if(row_num == 2){
+				ypos_list[0] = $(window).height()*0.375-card_height-card_interspace_y/2;
+				ypos_list[1] = $(window).height()*0.375+card_interspace_y/2;
+			}else{
+				ypos_list[0] = $(window).height()*0.375-card_height*3/2-card_interspace_y;
+				ypos_list[1] = $(window).height()*0.375-card_height/2;
+				ypos_list[2] = $(window).height()*0.375+card_height/2+card_interspace_y;
+			}
+			var xpos_list = [];
+			if(player_num%4 == 1){
+				xpos_list[0] = $(window).width()/2-card_height*0.375;
+			}else if(player_num%4 == 2){
+				xpos_list[0] = $(window).width()/2-card_height*0.75-card_interspace_x/2;
+				xpos_list[1] = $(window).width()/2+card_interspace_x/2;
+			}else{
+				xpos_list[0] = $(window).width()/2-card_height*9/8-card_interspace_x;
+				xpos_list[1] = $(window).width()/2-card_height*3/8;
+				xpos_list[2] = $(window).width()/2+card_height*3/8+card_interspace_x;
+			}
+			
+			var cardlist = [];
+			var shapelist = [];
+			var imglist = [];
+			var playerlist = [];
+			var masklist = [];
+			for(var i=1;i<=player_num;i++){
+				cardlist[i] =  new createjs.Container();
+				var now_no = i%4;
+				if(now_no == 0){
+					now_no = 4;
+				}
+				if(row_num == 1 && player_num%4 != 0){
+					cardlist[i].x = xpos_list[now_no-1];
+				}else{
+					cardlist[i].x = (now_no)*card_interspace_x+(now_no-1)*0.75*card_height;
+				}
+				game_ui.addChild(cardlist[i]);
+				shapelist[i] = new createjs.Shape();
+				shapelist[i].graphics.beginFill("white").drawRoundRect(0,0,300,400,30);
+				cardlist[i].addChild(shapelist[i]);
+				if(photoarray[i] == "random"){
+					imglist[i] = randomshape();
+				}else{
+					imglist[i] = new createjs.Bitmap(headimgquery.getResult(photoarray[i]));
+					if(imglist[i].getBounds().width >= imglist[i].getBounds().height){
+						imglist[i].scaleY = imglist[i].scaleX = 280/imglist[i].getBounds().height;
+						imglist[i].x = -imglist[i].getBounds().width/2+140;
+						imglist[i].y = 0;
+					}else{
+						imglist[i].scaleY = imglist[i].scaleX = 280/imglist[i].getBounds().width;
+						imglist[i].x = 0;
+						imglist[i].y = -imglist[i].getBounds().height/2+140;
+					}
+					masklist[i] = new createjs.Shape();
+					masklist[i].graphics.beginFill("rgba(0,0,0,0)").drawRect(10,20,280,280);
+					cardlist[i].addChild(masklist[i]);
+					imglist[i].mask = masklist[i];	
+				}
+				imglist[i].x = 10;
+				imglist[i].y = 20;
+				cardlist[i].addChild(imglist[i]);
+				playerlist[i] = new createjs.Text("<?php echo trans('Player'); ?> #"+i, "60px Arial", "black");
+				playerlist[i].x = 15;
+				playerlist[i].y = 305;
+				playerlist[i].textBaseline = "top";
+				cardlist[i].addChild(playerlist[i]);
+				cardlist[i].y = ypos_list[Math.ceil(i/4)-1];
+				cardlist[i].scaleY = cardlist[i].scaleX = card_height/400;
+				if(i%4 == 0){
+					row_num--;
+				}
+			}
+			
+			
 		});
 	});
 	
@@ -386,6 +471,10 @@ function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
 
 //function used in singlestart() used to take photo.
 function takephotos(num,callbackFunction,nownum,lastarray){
+	if(!takephotos.phptoid){
+		takephotos.phptoid = 0;
+	}
+	takephotos.phptoid++;
 	if(!nownum){
 		nownum = 1;
 		lastarray=[];
@@ -393,12 +482,30 @@ function takephotos(num,callbackFunction,nownum,lastarray){
 	if(nownum<=num){
 		calert("<?php echo trans('Player %1 ,It is your turn to take a photo now.'); ?>".replace(/%1/,nownum),function(){
 			getlogo(function(res){
-				lastarray[nownum] = res;
-				takephotos(num,callbackFunction,nownum+1,lastarray);
+				if(res){
+					headimgquery.loadFile({id:"userheadimg"+takephotos.phptoid,src:res,type:createjs.AbstractLoader.IMAGE});
+					lastarray[nownum] = "userheadimg"+takephotos.phptoid;
+					takephotos(num,callbackFunction,nownum+1,lastarray);
+				}else{
+					cconfirm("<?php echo trans('Player %1 ,It seems that you cancelled or photo was not successful taken. Retry or use random head portrait?.'); ?>".replace(/%1/,nownum),function(s){
+						if(s){
+							takephotos(num,callbackFunction,nownum,lastarray);
+						}else{
+							lastarray[nownum] = "random";
+							takephotos(num,callbackFunction,nownum+1,lastarray);
+						}
+					},"<?php echo trans('Retry'); ?>","<?php echo trans('Random'); ?>");
+				}
 			})
 		});
 	}else{
-		callbackFunction(lastarray);
+		if(!headimgquery.loaded){
+			headimgquery.on("complete",function(){
+				callbackFunction(lastarray);
+			},this);
+		}else{
+			callbackFunction(lastarray);
+		}
 	}
 }
 
@@ -410,16 +517,16 @@ function getlogo(callbackFunction){
 	//Script to execute if WechatEnabled
 	wx.chooseImage({
 		count: 1,
-		sizeType: ['original', 'compressed'],
+		sizeType: 'original',
 		sourceType: ['album', 'camera'],
 		success: function(res){
 			callbackFunction(res.localIds);
 		},
 		cancel: function(){
-			callbackFunction("");
+			callbackFunction(false);
 		},
 		fail: function(){
-			callbackFunction("");
+			callbackFunction(false);
 		},
 	});
 	<?php 
@@ -430,4 +537,24 @@ function getlogo(callbackFunction){
 	<?php 
 	}
 	?>
+}
+
+//Generating random head portrait
+function randomshape(){
+	var shape = new createjs.Shape();
+	var backcolor = "rgb("+Math.floor(Math.random()*256)+","+Math.floor(Math.random()*256)+","+Math.floor(Math.random()*256)+")"; 
+	var frontcolor = "rgb("+Math.floor(Math.random()*256)+","+Math.floor(Math.random()*256)+","+Math.floor(Math.random()*256)+")"; 
+	for(var i=0;i<3;i++){
+		for(var n=0;n<5;n++){
+			if(Math.round(Math.random()) == 1){
+				shape.graphics.beginFill(backcolor).drawRect(56*i,56*n,57,57);
+				shape.graphics.beginFill(backcolor).drawRect(56*(4-i),56*n,57,57);
+			}else{
+				shape.graphics.beginFill(frontcolor).drawRect(56*i,56*n,57,57);
+				shape.graphics.beginFill(frontcolor).drawRect(56*(4-i),56*n,57,57);
+			}
+		}
+	}
+	shape.cache(0, 0, 280, 310);
+	return shape;
 }

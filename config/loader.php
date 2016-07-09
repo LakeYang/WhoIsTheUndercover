@@ -12,8 +12,13 @@ unset($langfile);
 if(isset($_GET['url'])){
 	$url=$_GET['url'];
 }else{
+	$SignHost = $_SERVER['HTTP_HOST'];
 	$HTTP_SCHEME = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-	$url = urlencode($HTTP_SCHEME.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+	if(CutPort){
+		$SignHost = explode(":",$SignHost);
+		$SignHost = $SignHost[0];
+	}
+	$url = urlencode($HTTP_SCHEME.$SignHost.$_SERVER['REQUEST_URI']);
 }
 //Translation function
 function trans($transtext){
