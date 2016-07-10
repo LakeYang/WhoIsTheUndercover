@@ -49,8 +49,11 @@ $(document).ready(function(){
 		{id:"blue_stamp", src:"assets/image/blue_wax_stamp.png"},
 		{id:"modeselect_background", src:"assets/image/modeselect_bg.png"},
 		{id:"wood_brand", src:"assets/image/rules.png"},
+		{id:"card_background", src:"assets/image/card_background.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
+		{id:"stamp", src:"assets/audio/stamp.mp3"},
+		{id:"flipcard", src:"assets/audio/flipcard.ogg"},
 		{id:"sound_click", src:"assets/audio/click.ogg"}
 	]);
 });
@@ -348,7 +351,8 @@ function singlemode(){
 		main_ui.removeAllChildren();
 		main_ui.x = 0;
 		calert("Done",function(){
-			singlestart(3,1,0,0,1);
+			wordssss=['辣椒','芥末'];
+			singlestart(4,1,0,wordssss,1);
 		});
 	});
 }
@@ -359,7 +363,7 @@ function networkmode(){
 }
 
 //Single mode game start
-function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
+function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 	//block first
 	var main_block = new createjs.Shape();
 	main_block.alpha = 0;
@@ -432,24 +436,24 @@ function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
 				cardlist[i].addChild(shapelist[i]);
 				if(photoarray[i] == "random"){
 					imglist[i] = randomshape();
+					imglist[i].x = 10;
+					imglist[i].y = 20;
 				}else{
 					imglist[i] = new createjs.Bitmap(headimgquery.getResult(photoarray[i]));
 					if(imglist[i].getBounds().width >= imglist[i].getBounds().height){
 						imglist[i].scaleY = imglist[i].scaleX = 280/imglist[i].getBounds().height;
-						imglist[i].x = -imglist[i].getBounds().width/2+140;
-						imglist[i].y = 0;
+						imglist[i].x = -imglist[i].getBounds().width*imglist[i].scaleX/2+150;
+						imglist[i].y = 20;
 					}else{
 						imglist[i].scaleY = imglist[i].scaleX = 280/imglist[i].getBounds().width;
-						imglist[i].x = 0;
-						imglist[i].y = -imglist[i].getBounds().height/2+140;
+						imglist[i].x = 10;
+						imglist[i].y = -imglist[i].getBounds().height*imglist[i].scaleY/2+160;
 					}
 					masklist[i] = new createjs.Shape();
 					masklist[i].graphics.beginFill("rgba(0,0,0,0)").drawRect(10,20,280,280);
 					cardlist[i].addChild(masklist[i]);
-					imglist[i].mask = masklist[i];	
+					imglist[i].mask = masklist[i];
 				}
-				imglist[i].x = 10;
-				imglist[i].y = 20;
 				cardlist[i].addChild(imglist[i]);
 				playerlist[i] = new createjs.Text("<?php echo trans('Player'); ?> #"+i, "60px Arial", "black");
 				playerlist[i].x = 15;
@@ -462,7 +466,76 @@ function singlestart(player_num,spy_num,white_num,wordtype,mustphoto){
 					row_num--;
 				}
 			}
-			
+			var wordsarray = [];
+			for(var i=0;i<=player_num;i++){
+				wordsarray.push("");
+			}
+			var spyword = wordarr[0];
+			var folkword = wordarr[1];
+			if(Math.round(Math.random())){
+				var temp = spyword;
+				spyword = folkword;
+				folkword = temp;
+			}
+			var nonwhitearray = arrayselect(player_num-white_num,player_num);
+			var spyarray = [];
+			$.each(arrayselect(spy_num,player_num-white_num),function(key,val){
+				spyarray.push(nonwhitearray[val-1]);
+			});
+			for(var i=1;i<=player_num;i++){
+				if($.inArray(i,nonwhitearray) != -1){
+					//not white
+					if($.inArray(i,spyarray) == -1){
+						wordsarray[i] = folkword;
+					}else{
+						wordsarray[i] = spyword;
+					}
+				}
+			}
+			showcardword(cardlist,wordsarray,function(){
+				if(white_num == 0){
+					calert("<?php echo trans('Please describe the words by order. When a round is complete, click the player card to vote him(her) as an Undercover.'); ?>",function(){
+						//Add mouse event listener
+						for(var i=1;i<=player_num;i++){
+							shapelist[i].no = i;
+							shapelist[i].addEventListener("click", function(evt){
+								cconfirm("<?php echo trans('Confirm to vote Player #%1 as an undercover?'); ?>".replace(/%1/,evt.target.no),function(s){
+									if(s){
+										evt.target.removeAllEventListeners("click");
+										evt.target.parent.lastx = evt.target.parent.x;
+										evt.target.parent.lasty = evt.target.parent.y;
+										evt.target.parent.scale = evt.target.parent.scaleX;
+										var showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
+										var idstamp = new createjs.Container();
+										var shapeline = new createjs.Shape();
+										shapeline.graphics.setStrokeStyle(20,'square','square').beginStroke("#993300").moveTo(0,0).lineTo(0,150).lineTo(330,150).lineTo(330,0).lineTo(0,0);
+										var idtext = new createjs.Text("<?php echo trans('SPY'); ?>", "80px Arial", "#ff7700");
+										idtext.y = 75;
+										idtext.x = 165;
+										idtext.textAlign = "center"
+										idtext.textBaseline = "middle";
+										idstamp.addChild(idtext);
+										idstamp.addChild(shapeline);
+										idstamp.regX = 165;
+										idstamp.regY = 75;
+										idstamp.rotation = -25;
+										idstamp.y = 200;
+										idstamp.x = 150;
+										idstamp.alpha = 0;
+										idstamp.scaleY = idstamp.scaleX = 10;
+										evt.target.parent.addChild(idstamp);
+										play("stamp");
+										createjs.Tween.get(idstamp).to({scaleX:1,scaleY:1,alpha:1},700,createjs.Ease.quintIn);
+									}
+								},"<?php echo trans('Assuredly'); ?>","<?php echo trans('Maybe..not'); ?>");
+							});
+						}
+					});
+						
+				}else{
+					//start targeting person to describe
+				}
+			});
 			
 		});
 	});
@@ -511,9 +584,9 @@ function takephotos(num,callbackFunction,nownum,lastarray){
 
 //Universal function to get user's head portrait
 function getlogo(callbackFunction){
-	<?php 
-	if(WechatEnabled){
-	?>
+<?php 
+if(WechatEnabled){
+?>
 	//Script to execute if WechatEnabled
 	wx.chooseImage({
 		count: 1,
@@ -529,14 +602,14 @@ function getlogo(callbackFunction){
 			callbackFunction(false);
 		},
 	});
-	<?php 
-	}else{
-	?>
+<?php 
+}else{
+?>
 	//Script to execute if WechatDisabled
-	
-	<?php 
-	}
-	?>
+	callbackFunction(false);
+<?php 
+}
+?>
 }
 
 //Generating random head portrait
@@ -558,3 +631,93 @@ function randomshape(){
 	shape.cache(0, 0, 280, 310);
 	return shape;
 }
+
+//Displaying words cards
+function showcardword(cardlist,wordsarray,callbackFunction,currenti){
+	if(!currenti){
+		showcardword.nowkey = 1;
+		showcardword.showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
+	}else{
+		showcardword.nowkey++;
+	}
+	if(cardlist[showcardword.nowkey] != undefined){
+		showcardword.lastx = cardlist[showcardword.nowkey].x;
+		showcardword.lasty = cardlist[showcardword.nowkey].y;
+		showcardword.lastscale = cardlist[showcardword.nowkey].scaleX;
+		showcardword.lastclone = cardlist[showcardword.nowkey].clone(true);
+		//Because of Chrome security issue, cross-origin image may not respond to click event correctly. Use an almost transparent mask to solve it.
+		var clickmask = new createjs.Shape();
+		clickmask.graphics.beginFill("rgba(0,0,0,0.01)").drawRect(0,0,300,400);
+		showcardword.lastclone.addChild(clickmask);
+		cardlist[showcardword.nowkey].alpha = 0;
+		game_ui.addChild(showcardword.lastclone);
+		createjs.Tween.get(showcardword.lastclone).to({},500).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},500,createjs.Ease.backOut).call(function(){
+			clickmask.addEventListener("click", function(evt){
+				play("flipcard");
+				createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2,scaleX:0},200).call(function(){
+					var card_backimg = new createjs.Bitmap(queue.getResult("card_background"));
+					card_backimg.scaleY = card_backimg.scaleX = 2;
+					showcardword.lastclone.addChild(card_backimg);
+					var wordtext = new createjs.Text(wordsarray[showcardword.nowkey], "60px Arial", "black");
+					wordtext.x = 150;
+					wordtext.y= 30;
+					wordtext.maxWidth = 300;
+					wordtext.textAlign = "center";
+					wordtext.textBaseline = "top";
+					showcardword.lastclone.addChild(wordtext);
+					if(wordsarray[showcardword.nowkey] == ""){
+						var hinttext = new createjs.Text("<?php echo trans('You just picked up a blank card. Try to guess others` words and confuse others to protect yourself. '); ?><?php echo trans('Click again and pass the phone to the next.'); ?>", "20px Arial", "black");
+					}else{
+						var hinttext = new createjs.Text("<?php echo trans('Remember your word and do not tell it to others. When you finish, '); ?><?php echo trans('Click again and pass the phone to the next.'); ?>", "20px Arial", "black");
+					}
+					hinttext.x = 20;
+					hinttext.y = 200;
+					hinttext.maxWidth = 260;
+					hinttext.lineWidth = 260;
+					hinttext.textBaseline = "top";
+					showcardword.lastclone.addChild(hinttext);
+					createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).call(function(){
+						clickmask.addEventListener("click", function(evt){
+							play("flipcard");
+							createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2,scaleX:0},200).call(function(){
+								showcardword.lastclone.removeChild(hinttext,wordtext,card_backimg);
+								createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).to({x:showcardword.lastx,y:showcardword.lasty,scaleX:showcardword.lastscale,scaleY:showcardword.lastscale},500).call(function(){
+									showcardword.lastclone.parent.removeChild(showcardword.lastclone);
+									cardlist[showcardword.nowkey].alpha = 1;
+									showcardword(cardlist,wordsarray,callbackFunction,1);
+								});
+							});
+							evt.remove();
+						});
+					});
+				});
+				evt.remove();
+			});
+		});
+	}else{
+		callbackFunction();
+	}
+}
+
+//Random selection
+function arrayselect(pickups,numbers){
+	var outputarr = [];
+	outputarr.push(Math.ceil(Math.random()*numbers));
+	var found = 0;
+	for(var i=2;i<=pickups;i++){
+		do{
+			found = 0;
+			var tmp = Math.ceil(Math.random()*numbers);
+			$.each(outputarr,function(key,value){
+				if(tmp == value){
+					found++;
+					return false;
+				}
+			});	
+		}while(found);	
+		outputarr.push(tmp);
+	}
+	return outputarr.sort();
+}
+
+//Who will be the next?

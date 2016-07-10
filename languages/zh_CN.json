@@ -16,5 +16,16 @@
 "Single": "单机模式",
 "Network": "联网模式",
 "Player": "玩家",
+"Random": "随机",
+"Retry": "重试",
+"Assuredly": "就Ta了",
+"Maybe..not": "再想想",
+"SPY": "卧底",
+"FOLK": "平民",
+"Confirm to vote Player #%1 as an undercover?": "确定投票 玩家#%1 为卧底吗？",
+"Please describe the words by order. When a round is complete, click the player card to vote him(her) as an Undercover.": "请按顺序描述卡片词语。 当一轮结束后， 请点击玩家头像以投票为卧底。",
+"Remember your word and do not tell it to others. When you finish, ": "牢记你的词语， 不要告诉其他人。 当你记住后， ",
+"You just picked up a blank card. Try to guess others` words and confuse others to protect yourself. ": "你刚刚抽到了白板， 请根据他人描述混淆视听， 保护自己。 ",
+"Click again and pass the phone to the next.": "点击卡片并把手机传递给下一个人。",
 "Rules": "游戏规则 多人游戏，1人卧底。每人拿到一个词语， 其中拿到与之相关的不同词语者为卧底。 每人每轮说一句描述自己词语的话，以此 为依据投票指认卧底，得票数多者出局。若 卧底撑到还剩3人，则卧底获胜，反之群众获胜。"
 }
