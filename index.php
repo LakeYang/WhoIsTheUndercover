@@ -23,7 +23,7 @@ if(isset($_GET['code']) && WechatEnabled){
 		$UserImg = "UNSET";
 	}
 }else if(WechatEnabled){
-	header('Location: https://open.weixin.qq.com/connect/oauth2/authorize?appid='.APPID.'&redirect_uri='.$url.'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect');//&state=STATE
+	header('Location: https://open.weixin.qq.com/connect/oauth2/authorize?appid='.APPID.'&redirect_uri='.$url.'&response_type=code&scope=snsapi_userinfo#wechat_redirect');
 	exit;
 }
 ?>

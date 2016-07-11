@@ -70,15 +70,15 @@ function init(){
 	background.alpha=0;
 	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, $(window).width(), $(window).height());
 	stage.addChild(background);
-	//ui container for main page
-	main_ui = new createjs.Container();
-	stage.addChild(main_ui);
 	//ui container for the first mode page
 	mode_ui = new createjs.Container();
 	stage.addChild(mode_ui);
 	//UI FOR GAME
 	game_ui = new createjs.Container();
 	stage.addChild(game_ui);
+	//ui container for main page
+	main_ui = new createjs.Container();
+	stage.addChild(main_ui);
 	//top UI, container for calert() cconfirm(), etc.
 	top_ui = new createjs.Container();
 	stage.addChild(top_ui);
@@ -208,7 +208,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 			top_ui.removeChild(evt.target.parent.parent);
 		});
 		evt.remove();
-    });
+	});
 	
 	var cancel_btn = new createjs.Container();
 	cconfirm.alertlist[cconfirm.counter].addChild(cancel_btn);
@@ -250,13 +250,11 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 
 //canvas modeselect function
 function modeselect(){
-		btnsingletext = "<?php echo trans('Single'); ?>";
-		btnnetworktext = "<?php echo trans('Network'); ?>";
-		info = "<?php echo trans('Rules'); ?>";
-	if(!modeselect.counter){
-		modeselect.counter = 0;
-	}
-	ms_background = new createjs.Container();
+	var btnsingletext = "<?php echo trans('Single'); ?>";
+	var btnnetworktext = "<?php echo trans('Network'); ?>";
+	var info = "<?php echo trans('Rules'); ?>";
+	main_ui.x = 0;
+	var ms_background = new createjs.Container();
 	main_ui.addChild(ms_background);
 	//Draw background here.
 	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
@@ -269,8 +267,9 @@ function modeselect(){
 	ms_background.y=$(window).height()/2;
 	ms_background.alpha=0;
 	createjs.Tween.get(ms_background).to({alpha: 1},500).call(function(){
+		game_ui.removeAllChildren();
 	});
-	rules = new createjs.Container();
+	var rules = new createjs.Container();
 	main_ui.addChild(rules);
 	//Draw rules here.
 	var rules_brand = new createjs.Bitmap(queue.getResult("wood_brand"));
@@ -285,9 +284,6 @@ function modeselect(){
 	rules.scaleY = ctn_scaley;
 	rules.alpha=0;
 	createjs.Tween.get(rules).to({alpha: 1,y:500*ctn_scaley/2},500).to({y:460*ctn_scaley/2},200).to({y:500*ctn_scaley/2},250).call(function(){
-		calert("Hello, "+user_nickname+" Welcome to the world of undercovers",function(){
-			
-		})
 	});
 	var rules_text = new createjs.Text(info, "30px Arial", "black");
 	rules.addChild(rules_text);
@@ -331,7 +327,6 @@ function modeselect(){
 		play("sound_click");
 		networkmode();
     });
-	modeselect.counter++;
 }
 
 //Single mode main setting page
@@ -349,10 +344,9 @@ function singlemode(){
 	createjs.Tween.get(main_ui).to({x:-$(window).width()},500);
 	createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
-		main_ui.x = 0;
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
-			singlestart(4,1,0,wordssss,1);
+			singlestart(3,1,0,wordssss,1);
 		});
 	});
 }
@@ -364,6 +358,7 @@ function networkmode(){
 
 //Single mode game start
 function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
+	var folk_num = player_num - spy_num - white_num;
 	//block first
 	var main_block = new createjs.Shape();
 	main_block.alpha = 0;
@@ -381,6 +376,10 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 	createjs.Tween.get(game_ui).to({x:0},500).call(function(){
 		mode_ui.removeAllChildren();
 		mode_ui.x = 0;
+		//Remove headimgquery if defined
+		if(headimgquery){
+			headimgquery.removeAll();
+		}
 		//Start distribute card and take photos
 		takephotos(player_num,function(photoarray){
 			if($(window).width()<=$(window).height()*0.76875){
@@ -458,6 +457,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 				playerlist[i] = new createjs.Text("<?php echo trans('Player'); ?> #"+i, "60px Arial", "black");
 				playerlist[i].x = 15;
 				playerlist[i].y = 305;
+				playerlist[i].maxWidth = 270;
 				playerlist[i].textBaseline = "top";
 				cardlist[i].addChild(playerlist[i]);
 				cardlist[i].y = ypos_list[Math.ceil(i/4)-1];
@@ -466,6 +466,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 					row_num--;
 				}
 			}
+			//Distribute words randomly
 			var wordsarray = [];
 			for(var i=0;i<=player_num;i++){
 				wordsarray.push("");
@@ -477,6 +478,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 				spyword = folkword;
 				folkword = temp;
 			}
+			wordsarray[0] = spyword;
 			var nonwhitearray = arrayselect(player_num-white_num,player_num);
 			var spyarray = [];
 			$.each(arrayselect(spy_num,player_num-white_num),function(key,val){
@@ -493,53 +495,136 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 				}
 			}
 			showcardword(cardlist,wordsarray,function(){
-				if(white_num == 0){
-					calert("<?php echo trans('Please describe the words by order. When a round is complete, click the player card to vote him(her) as an Undercover.'); ?>",function(){
-						//Add mouse event listener
-						for(var i=1;i<=player_num;i++){
-							shapelist[i].no = i;
-							shapelist[i].addEventListener("click", function(evt){
-								cconfirm("<?php echo trans('Confirm to vote Player #%1 as an undercover?'); ?>".replace(/%1/,evt.target.no),function(s){
-									if(s){
-										evt.target.removeAllEventListeners("click");
-										evt.target.parent.lastx = evt.target.parent.x;
-										evt.target.parent.lasty = evt.target.parent.y;
-										evt.target.parent.scale = evt.target.parent.scaleX;
-										var showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
-										var idstamp = new createjs.Container();
-										var shapeline = new createjs.Shape();
+				calert("<?php echo trans('Please describe the words by order. When a round is complete, click the player card to vote him(her) as an Undercover.'); ?>",function(){
+					//Add mouse event listener
+					for(var i=1;i<=player_num;i++){
+						shapelist[i].no = i;
+						shapelist[i].addEventListener("click", function(evt){
+							cconfirm("<?php echo trans('Confirm to vote Player #%1 as an undercover?'); ?>".replace(/%1/,evt.target.no),function(s){
+								if(s){
+									evt.target.removeAllEventListeners("click");
+									evt.target.parent.lastx = evt.target.parent.x;
+									evt.target.parent.lasty = evt.target.parent.y;
+									evt.target.parent.scale = evt.target.parent.scaleX;
+									var showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
+									var idstamp = new createjs.Container();
+									var shapeline = new createjs.Shape();
+									if(wordsarray[0] == wordsarray[evt.target.no]){
 										shapeline.graphics.setStrokeStyle(20,'square','square').beginStroke("#993300").moveTo(0,0).lineTo(0,150).lineTo(330,150).lineTo(330,0).lineTo(0,0);
-										var idtext = new createjs.Text("<?php echo trans('SPY'); ?>", "80px Arial", "#ff7700");
-										idtext.y = 75;
-										idtext.x = 165;
-										idtext.textAlign = "center"
-										idtext.textBaseline = "middle";
-										idstamp.addChild(idtext);
-										idstamp.addChild(shapeline);
-										idstamp.regX = 165;
-										idstamp.regY = 75;
-										idstamp.rotation = -25;
-										idstamp.y = 200;
-										idstamp.x = 150;
-										idstamp.alpha = 0;
-										idstamp.scaleY = idstamp.scaleX = 10;
-										evt.target.parent.addChild(idstamp);
-										play("stamp");
-										createjs.Tween.get(idstamp).to({scaleX:1,scaleY:1,alpha:1},700,createjs.Ease.quintIn);
+										var idtext = new createjs.Text("<?php echo trans('SPY'); ?>", "80px Arial", "#993300");
+										spy_num--;
+									}else if(wordsarray[evt.target.no] != ""){
+										shapeline.graphics.setStrokeStyle(20,'round').beginStroke("#993300").drawCircle(165,75,180);
+										var idtext = new createjs.Text("<?php echo trans('FOLK'); ?>", "80px Arial", "#993300");
+										folk_num--;
+									}else{
+										shapeline.graphics.setStrokeStyle(20,'round').beginStroke("#993300").drawRoundRect(0,0,330,150,30);
+										var idtext = new createjs.Text("<?php echo trans('BLANK'); ?>", "80px Arial", "#993300");
+										white_num--;
 									}
-								},"<?php echo trans('Assuredly'); ?>","<?php echo trans('Maybe..not'); ?>");
-							});
-						}
-					});
-						
-				}else{
-					//start targeting person to describe
-				}
+									if(((player_num <= 6) && spy_num+folk_num+white_num == 2) || ((player_num > 6) && spy_num+folk_num+white_num == 3)){
+										if(spy_num){
+											//Spy win
+											var flag = 1;
+										}else if(white_num){
+											//White win
+											var flag = 2;
+										}else{
+											//Folk win
+											var flag = 3;
+										}
+									}else if(!spy_num){
+										if(white_num){
+											//White win
+											var flag = 2;
+										}else{
+											//Folk win
+											var flag = 3;
+										}
+									}else if(spy_num >= folk_num){
+										//Spy win
+										var flag = 1;
+									}else{
+										var flag = 0;
+									}
+									if(flag){
+										switch(flag){
+											case 1:
+												var endingtxt = "<?php echo trans('Undercovers win! Undercovers: Player %1'); ?>".replace(/%1/,123);
+												break;
+											case 2:
+												var endingtxt = "<?php echo trans('Blanks win! Undercovers have been eliminated.'); ?>";
+												break;
+											case 3:
+												var endingtxt = "<?php echo trans('Folks win! Undercovers have been eliminated.'); ?>";
+												break;
+										}
+										setTimeout(function(){
+											cconfirm(endingtxt,function(s){
+												if(s){
+													//Punish,generating a person to accept punishment
+													var ranpeople = 0;
+													var looping = 1;
+													do{
+														ranpeople = Math.ceil(Math.random()*player_num);
+														switch(flag){
+															case 1:
+																if(wordsarray[0] != wordsarray[ranpeople]){
+																	looping = 0;
+																}
+																break;
+															case 2:
+																if(wordsarray[ranpeople] != ""){
+																	looping = 0;
+																}
+																break;
+															case 3:
+																if(wordsarray[ranpeople] == wordsarray[0] || wordsarray[ranpeople] == ""){
+																	looping = 0;
+																}
+																break;
+														}
+													}while(looping);
+													shapelist[ranpeople].removeAllEventListeners("click");
+													$.each(cardlist,function(key,val){
+														if(key != ranpeople && key){
+															createjs.Tween.get(cardlist[key]).to({},500).to({alpha:0},600);
+														}
+													})
+													createjs.Tween.get(cardlist[ranpeople]).to({},1000).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},1000,createjs.Ease.cubicOut).call(function(){
+														playerlist[ranpeople].text += " <?php echo trans('Obediently Punished'); ?>";
+													});
+												}else{
+													modeselect();
+												}
+											},"<?php echo trans('Punishment'); ?>","<?php echo trans('Main menu'); ?>");
+										},1000);
+										
+									}
+									idtext.y = 75;
+									idtext.x = 165;
+									idtext.textAlign = "center"
+									idtext.textBaseline = "middle";
+									idstamp.addChild(idtext);
+									idstamp.addChild(shapeline);
+									idstamp.regX = 165;
+									idstamp.regY = 75;
+									idstamp.rotation = -25;
+									idstamp.y = 200;
+									idstamp.x = 150;
+									idstamp.alpha = 0;
+									idstamp.scaleY = idstamp.scaleX = 10;
+									evt.target.parent.addChild(idstamp);
+									play("stamp");
+									createjs.Tween.get(idstamp).to({scaleX:1,scaleY:1,alpha:1},700,createjs.Ease.quintIn);
+								}
+							},"<?php echo trans('Assuredly'); ?>","<?php echo trans('Maybe..not'); ?>");
+						});
+					}
+				});
 			});
-			
 		});
 	});
-	
 }
 
 //function used in singlestart() used to take photo.
@@ -560,7 +645,7 @@ function takephotos(num,callbackFunction,nownum,lastarray){
 					lastarray[nownum] = "userheadimg"+takephotos.phptoid;
 					takephotos(num,callbackFunction,nownum+1,lastarray);
 				}else{
-					cconfirm("<?php echo trans('Player %1 ,It seems that you cancelled or photo was not successful taken. Retry or use random head portrait?.'); ?>".replace(/%1/,nownum),function(s){
+					cconfirm("<?php echo trans('Player %1 failed to take a photo. Retry or use random head portrait?'); ?>".replace(/%1/,nownum),function(s){
 						if(s){
 							takephotos(num,callbackFunction,nownum,lastarray);
 						}else{
@@ -572,10 +657,14 @@ function takephotos(num,callbackFunction,nownum,lastarray){
 			})
 		});
 	}else{
-		if(!headimgquery.loaded){
-			headimgquery.on("complete",function(){
+		if(headimgquery.getItems(false).length){
+			if(headimgquery.loaded){
 				callbackFunction(lastarray);
-			},this);
+			}else{
+				headimgquery.on("complete",function(){
+					callbackFunction(lastarray);
+				},this);
+			}
 		}else{
 			callbackFunction(lastarray);
 		}
