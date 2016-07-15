@@ -44,6 +44,8 @@ $(document).ready(function(){
 <?php if(WechatEnabled){ ?>
 		{id:"jweixin", src:"js/libs/jweixin-1.0.0.js"},
 <?php } ?>
+		{id:"words", src:"resources/words/<?php echo $language; ?>.json"},
+		{id:"punishments", src:"resources/penalties/<?php echo $language; ?>.json"},
 		{id:"popup_background", src:"assets/image/old_scroll.png"},
 		{id:"red_stamp", src:"assets/image/red_wax_stamp.png"},
 		{id:"blue_stamp", src:"assets/image/blue_wax_stamp.png"},
@@ -61,6 +63,19 @@ $(document).ready(function(){
 
 //User clicked enter, initiate canvas.
 function init(){
+	//Parse json to array first
+	words = [];
+	var temp = queue.getResult("words");
+	for(var x in temp){
+		temp[x].splice(0,0,x)
+		words.push(temp[x]);
+	}
+	punishments = [];
+	temp = queue.getResult("punishments");
+	for(var x in temp){
+		punishments.push(temp[x]);
+	}
+	//Pixel ratio for most mobile is 2
 	var PixelRatio = 2;
 	stage_height = $(window).height()*PixelRatio;
 	stage_width = $(window).width()*PixelRatio;
