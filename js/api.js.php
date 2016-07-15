@@ -61,14 +61,17 @@ $(document).ready(function(){
 
 //User clicked enter, initiate canvas.
 function init(){
-	$("body").append('<canvas id="mainCanvas" height="'+$(window).height()+'px" width="'+$(window).width()+'px" style="position: absolute; left: 0px; top: 0px;"></canvas>');
+	var PixelRatio = 2;
+	stage_height = $(window).height()*PixelRatio;
+	stage_width = $(window).width()*PixelRatio;
+	$("body").append('<canvas id="mainCanvas" height="'+stage_height+'px" width="'+stage_width+'px" style="position: absolute; left: 0px; top: 0px; width: '+$(window).width()+'px; height: '+$(window).height()+'px;"></canvas>');
 	stage = new createjs.Stage("mainCanvas");
 	createjs.Touch.enable(stage);
 	play("sound_click");
 	//Draw background that fade in
 	background = new createjs.Shape();
 	background.alpha=0;
-	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, $(window).width(), $(window).height());
+	background.graphics.beginFill("rgb(187,209,232)").drawRect(0, 0, stage_width, stage_height);
 	stage.addChild(background);
 	//ui container for the first mode page
 	mode_ui = new createjs.Container();
@@ -112,7 +115,7 @@ function calert(info,callbackFunction,btntext){
 	calert.alertlist[calert.counter] = new createjs.Container();
 	top_ui.addChild(calert.alertlist[calert.counter]);
 	//Draw things here.
-	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.75*0.773)/773;
+	var ctn_scale = Math.min(stage_width*0.8,stage_height*0.75*0.773)/773;
 	var ctn_back = new createjs.Bitmap(queue.getResult("popup_background"));
 	calert.alertlist[calert.counter].addChild(ctn_back);
 	var show_text = new createjs.Text(info, "80px Arial", "black");
@@ -142,7 +145,7 @@ function calert(info,callbackFunction,btntext){
 	ok_btn.addEventListener("click", function(evt) {
 		callbackFunction();
 		play("paper2");
-		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
 		});
 		evt.remove();
@@ -150,11 +153,11 @@ function calert(info,callbackFunction,btntext){
 	calert.alertlist[calert.counter].regX=386;
 	calert.alertlist[calert.counter].regY=500;
 	calert.alertlist[calert.counter].scaleY=calert.alertlist[calert.counter].scaleX = ctn_scale;
-	calert.alertlist[calert.counter].x=$(window).width()/2;
-	calert.alertlist[calert.counter].y=$(window).height()/2-60;
+	calert.alertlist[calert.counter].x=stage_width/2;
+	calert.alertlist[calert.counter].y=stage_height/2-60;
 	calert.alertlist[calert.counter].alpha=0;
 	play("paper1");
-	createjs.Tween.get(calert.alertlist[calert.counter]).to({alpha: 1,y:$(window).height()/2},500).call(function(){
+	createjs.Tween.get(calert.alertlist[calert.counter]).to({alpha: 1,y:stage_height/2},500).call(function(){
 	});
 	calert.counter++;
 }
@@ -174,7 +177,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cconfirm.alertlist[cconfirm.counter] = new createjs.Container();
 	top_ui.addChild(cconfirm.alertlist[cconfirm.counter]);
 	//Draw things here.
-	var ctn_scale = Math.min($(window).width()*0.8,$(window).height()*0.75*0.773)/773;
+	var ctn_scale = Math.min(stage_width*0.8,stage_height*0.75*0.773)/773;
 	var ctn_back = new createjs.Bitmap(queue.getResult("popup_background"));
 	cconfirm.alertlist[cconfirm.counter].addChild(ctn_back);
 	var show_text = new createjs.Text(info, "80px Arial", "black");
@@ -204,7 +207,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	ok_btn.addEventListener("click", function(evt) {
 		callbackFunction(1);
 		play("paper2");
-		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
 		});
 		evt.remove();
@@ -230,7 +233,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cancel_btn.addEventListener("click", function(evt) {
 		callbackFunction(0);
 		play("paper2");
-		createjs.Tween.get(evt.target.parent.parent).to({y:$(window).height()/2-50},100).to({alpha:0,y:$(window).height()/2+100},100).call(function(){
+		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
 		});
 		evt.remove();
@@ -239,11 +242,11 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cconfirm.alertlist[cconfirm.counter].regX=386;
 	cconfirm.alertlist[cconfirm.counter].regY=500;
 	cconfirm.alertlist[cconfirm.counter].scaleY=cconfirm.alertlist[cconfirm.counter].scaleX = ctn_scale;
-	cconfirm.alertlist[cconfirm.counter].x=$(window).width()/2;
-	cconfirm.alertlist[cconfirm.counter].y=$(window).height()/2-60;
+	cconfirm.alertlist[cconfirm.counter].x=stage_width/2;
+	cconfirm.alertlist[cconfirm.counter].y=stage_height/2-60;
 	cconfirm.alertlist[cconfirm.counter].alpha=0;
 	play("paper1");
-	createjs.Tween.get(cconfirm.alertlist[cconfirm.counter]).to({alpha: 1,y:$(window).height()/2},500).call(function(){
+	createjs.Tween.get(cconfirm.alertlist[cconfirm.counter]).to({alpha: 1,y:stage_height/2},500).call(function(){
 	});
 	cconfirm.counter++;
 }
@@ -261,10 +264,10 @@ function modeselect(){
 	ms_background.addChild(ctn_back);
 	ms_background.regX=180;
 	ms_background.regY=320;
-	ms_background.scaleX = $(window).width()/360;
-	ms_background.scaleY = $(window).height()/640;
-	ms_background.x=$(window).width()/2;
-	ms_background.y=$(window).height()/2;
+	ms_background.scaleX = stage_width/360;
+	ms_background.scaleY = stage_height/640;
+	ms_background.x=stage_width/2;
+	ms_background.y=stage_height/2;
 	ms_background.alpha=0;
 	createjs.Tween.get(ms_background).to({alpha: 1},500).call(function(){
 		game_ui.removeAllChildren();
@@ -273,12 +276,12 @@ function modeselect(){
 	main_ui.addChild(rules);
 	//Draw rules here.
 	var rules_brand = new createjs.Bitmap(queue.getResult("wood_brand"));
-	var ctn_scalex = $(window).width()/500;
-	var ctn_scaley = $(window).height()*0.8/500;
+	var ctn_scalex = stage_width/500;
+	var ctn_scaley = stage_height*0.8/500;
 	rules.addChild(rules_brand);
 	rules.regX=250;
 	rules.regY=250;
-	rules.x=$(window).width()/2;
+	rules.x=stage_width/2;
 	rules.y=-500*ctn_scaley/2;
 	rules.scaleX = ctn_scalex;
 	rules.scaleY = ctn_scaley;
@@ -298,11 +301,11 @@ function modeselect(){
 	var single_btn_shape = new createjs.Shape();
 	single_btn_shape.graphics.beginFill("rgba(225,145,51,0.3)").drawRoundRect(0,-13,200,90,25);
 	single_btn.addChild(single_btn_shape);
-	var single_btn_scale = Math.min($(window).width()*0.8,$(window).height()*0.8)/400;
+	var single_btn_scale = Math.min(stage_width*0.8,stage_height*0.8)/400;
 	single_btn.regX=90;
 	single_btn.regY=45;
-	single_btn.x=$(window).width()/4;
-	single_btn.y=$(window).height()/7*6;
+	single_btn.x=stage_width/4;
+	single_btn.y=stage_height/7*6;
 	single_btn.scaleX = single_btn.scaleY = single_btn_scale ;
 	var single_btn_text = new createjs.Text(btnsingletext, "50px Arial", "white");
 	single_btn.addChild(single_btn_text);
@@ -315,11 +318,11 @@ function modeselect(){
 	var network_btn_shape = new createjs.Shape();
 	network_btn_shape.graphics.beginFill("rgba(24,161,95,0.5)").drawRoundRect(0,-13,200,90,25);
 	network_btn.addChild(network_btn_shape);
-	var network_btn_scale = Math.min($(window).width()*0.8,$(window).height()*0.8)/400;
+	var network_btn_scale = Math.min(stage_width*0.8,stage_height*0.8)/400;
 	network_btn.regX=110;
 	network_btn.regY=45;
-	network_btn.x=$(window).width()/4*3;
-	network_btn.y=$(window).height()/7*6;
+	network_btn.x=stage_width/4*3;
+	network_btn.y=stage_height/7*6;
 	network_btn.scaleX = network_btn.scaleY = network_btn_scale ;
 	var network_btn_text = new createjs.Text(btnnetworktext, "50px Arial", "white");
 	network_btn.addChild(network_btn_text);
@@ -334,14 +337,14 @@ function singlemode(){
 	//Draw a transparent mask on main_ui and give it click listener to block intractive from expired ui content
 	var main_block = new createjs.Shape();
 	main_block.alpha = 0;
-	main_block.graphics.beginFill("black").drawRect(0, 0, $(window).width(), $(window).height());
+	main_block.graphics.beginFill("black").drawRect(0, 0, stage_width, stage_height);
 	main_ui.addChild(main_block);
 	main_block.addEventListener("click",function(){/*This is a blackhole*/});
 	//Draw single mode ui here
 	
 	//ui animation
-	mode_ui.x = $(window).width();
-	createjs.Tween.get(main_ui).to({x:-$(window).width()},500);
+	mode_ui.x = stage_width;
+	createjs.Tween.get(main_ui).to({x:-stage_width},500);
 	createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
@@ -362,17 +365,17 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 	//block first
 	var main_block = new createjs.Shape();
 	main_block.alpha = 0;
-	main_block.graphics.beginFill("black").drawRect(0, 0, $(window).width(), $(window).height());
+	main_block.graphics.beginFill("black").drawRect(0, 0, stage_width, stage_height);
 	mode_ui.addChild(main_block);
 	main_block.addEventListener("click",function(){/*This is a blackhole*/});
 	//Animation first
 	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
-	ctn_back.scaleX = $(window).width()/360;
-	ctn_back.scaleY = $(window).height()/640;
+	ctn_back.scaleX = stage_width/360;
+	ctn_back.scaleY = stage_height/640;
 	game_ui.addChild(ctn_back);
 	
-	game_ui.x = $(window).width();
-	createjs.Tween.get(mode_ui).to({x:-$(window).width()},500);
+	game_ui.x = stage_width;
+	createjs.Tween.get(mode_ui).to({x:-stage_width},500);
 	createjs.Tween.get(game_ui).to({x:0},500).call(function(){
 		mode_ui.removeAllChildren();
 		mode_ui.x = 0;
@@ -382,35 +385,35 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 		}
 		//Start distribute card and take photos
 		takephotos(player_num,function(photoarray){
-			if($(window).width()<=$(window).height()*0.76875){
-				var card_height = $(window).width()*4/17;
+			if(stage_width<=stage_height*0.76875){
+				var card_height = stage_width*4/17;
 			}else{
-				var card_height = $(window).height()/4;
+				var card_height = stage_height/4;
 			}			
-			var card_interspace_x = ($(window).width()-3*card_height)/5;
-			var card_interspace_y = ($(window).height()*0.75-3*card_height)/4;
+			var card_interspace_x = (stage_width-3*card_height)/5;
+			var card_interspace_y = (stage_height*0.75-3*card_height)/4;
 			var row_num = Math.ceil(player_num/4);
 			var ypos_list = [];
 			if(row_num == 1){
-				ypos_list[0] = $(window).height()*0.375-card_height/2;
+				ypos_list[0] = stage_height*0.375-card_height/2;
 			}else if(row_num == 2){
-				ypos_list[0] = $(window).height()*0.375-card_height-card_interspace_y/2;
-				ypos_list[1] = $(window).height()*0.375+card_interspace_y/2;
+				ypos_list[0] = stage_height*0.375-card_height-card_interspace_y/2;
+				ypos_list[1] = stage_height*0.375+card_interspace_y/2;
 			}else{
-				ypos_list[0] = $(window).height()*0.375-card_height*3/2-card_interspace_y;
-				ypos_list[1] = $(window).height()*0.375-card_height/2;
-				ypos_list[2] = $(window).height()*0.375+card_height/2+card_interspace_y;
+				ypos_list[0] = stage_height*0.375-card_height*3/2-card_interspace_y;
+				ypos_list[1] = stage_height*0.375-card_height/2;
+				ypos_list[2] = stage_height*0.375+card_height/2+card_interspace_y;
 			}
 			var xpos_list = [];
 			if(player_num%4 == 1){
-				xpos_list[0] = $(window).width()/2-card_height*0.375;
+				xpos_list[0] = stage_width/2-card_height*0.375;
 			}else if(player_num%4 == 2){
-				xpos_list[0] = $(window).width()/2-card_height*0.75-card_interspace_x/2;
-				xpos_list[1] = $(window).width()/2+card_interspace_x/2;
+				xpos_list[0] = stage_width/2-card_height*0.75-card_interspace_x/2;
+				xpos_list[1] = stage_width/2+card_interspace_x/2;
 			}else{
-				xpos_list[0] = $(window).width()/2-card_height*9/8-card_interspace_x;
-				xpos_list[1] = $(window).width()/2-card_height*3/8;
-				xpos_list[2] = $(window).width()/2+card_height*3/8+card_interspace_x;
+				xpos_list[0] = stage_width/2-card_height*9/8-card_interspace_x;
+				xpos_list[1] = stage_width/2-card_height*3/8;
+				xpos_list[2] = stage_width/2+card_height*3/8+card_interspace_x;
 			}
 			
 			var cardlist = [];
@@ -506,7 +509,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 									evt.target.parent.lastx = evt.target.parent.x;
 									evt.target.parent.lasty = evt.target.parent.y;
 									evt.target.parent.scale = evt.target.parent.scaleX;
-									var showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
+									var showscale = Math.min(stage_width,stage_height*0.75)*0.6/300;
 									var idstamp = new createjs.Container();
 									var shapeline = new createjs.Shape();
 									if(wordsarray[0] == wordsarray[evt.target.no]){
@@ -591,7 +594,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 															createjs.Tween.get(cardlist[key]).to({},500).to({alpha:0},600);
 														}
 													})
-													createjs.Tween.get(cardlist[ranpeople]).to({},1000).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},1000,createjs.Ease.cubicOut).call(function(){
+													createjs.Tween.get(cardlist[ranpeople]).to({},1000).to({x:stage_width/2-150*showcardword.showscale,y:stage_height/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},1000,createjs.Ease.cubicOut).call(function(){
 														playerlist[ranpeople].text += " <?php echo trans('Obediently Punished'); ?>";
 													});
 												}else{
@@ -725,7 +728,7 @@ function randomshape(){
 function showcardword(cardlist,wordsarray,callbackFunction,currenti){
 	if(!currenti){
 		showcardword.nowkey = 1;
-		showcardword.showscale = Math.min($(window).width(),$(window).height()*0.75)*0.6/300;
+		showcardword.showscale = Math.min(stage_width,stage_height*0.75)*0.6/300;
 	}else{
 		showcardword.nowkey++;
 	}
@@ -740,10 +743,10 @@ function showcardword(cardlist,wordsarray,callbackFunction,currenti){
 		showcardword.lastclone.addChild(clickmask);
 		cardlist[showcardword.nowkey].alpha = 0;
 		game_ui.addChild(showcardword.lastclone);
-		createjs.Tween.get(showcardword.lastclone).to({},500).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},500,createjs.Ease.backOut).call(function(){
+		createjs.Tween.get(showcardword.lastclone).to({},500).to({x:stage_width/2-150*showcardword.showscale,y:stage_height/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},500,createjs.Ease.backOut).call(function(){
 			clickmask.addEventListener("click", function(evt){
 				play("flipcard");
-				createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2,scaleX:0},200).call(function(){
+				createjs.Tween.get(showcardword.lastclone).to({x:stage_width/2,scaleX:0},200).call(function(){
 					var card_backimg = new createjs.Bitmap(queue.getResult("card_background"));
 					card_backimg.scaleY = card_backimg.scaleX = 2;
 					showcardword.lastclone.addChild(card_backimg);
@@ -765,12 +768,12 @@ function showcardword(cardlist,wordsarray,callbackFunction,currenti){
 					hinttext.lineWidth = 260;
 					hinttext.textBaseline = "top";
 					showcardword.lastclone.addChild(hinttext);
-					createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).call(function(){
+					createjs.Tween.get(showcardword.lastclone).to({x:stage_width/2-150*showcardword.showscale,y:stage_height/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).call(function(){
 						clickmask.addEventListener("click", function(evt){
 							play("flipcard");
-							createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2,scaleX:0},200).call(function(){
+							createjs.Tween.get(showcardword.lastclone).to({x:stage_width/2,scaleX:0},200).call(function(){
 								showcardword.lastclone.removeChild(hinttext,wordtext,card_backimg);
-								createjs.Tween.get(showcardword.lastclone).to({x:$(window).width()/2-150*showcardword.showscale,y:$(window).height()/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).to({x:showcardword.lastx,y:showcardword.lasty,scaleX:showcardword.lastscale,scaleY:showcardword.lastscale},500).call(function(){
+								createjs.Tween.get(showcardword.lastclone).to({x:stage_width/2-150*showcardword.showscale,y:stage_height/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},200).to({x:showcardword.lastx,y:showcardword.lasty,scaleX:showcardword.lastscale,scaleY:showcardword.lastscale},500).call(function(){
 									showcardword.lastclone.parent.removeChild(showcardword.lastclone);
 									cardlist[showcardword.nowkey].alpha = 1;
 									showcardword(cardlist,wordsarray,callbackFunction,1);
