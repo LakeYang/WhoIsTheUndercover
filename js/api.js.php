@@ -51,6 +51,12 @@ $(document).ready(function(){
 		{id:"blue_stamp", src:"assets/image/blue_wax_stamp.png"},
 		{id:"modeselect_background", src:"assets/image/modeselect_bg.png"},
 		{id:"wood_brand", src:"assets/image/rules.png"},
+		{id:"singlemode_background", src:"assets/image/singlemode_background.png"},
+		{id:"gear1", src:"assets/image/gear1.png"},
+		{id:"gear2", src:"assets/image/gear2.png"},
+		{id:"gear3", src:"assets/image/gear3.png"},
+		{id:"gear4", src:"assets/image/gear4.png"},
+		{id:"gear5", src:"assets/image/gear5.png"},
 		{id:"card_background", src:"assets/image/card_background.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
@@ -291,8 +297,8 @@ function modeselect(){
 	main_ui.addChild(rules);
 	//Draw rules here.
 	var rules_brand = new createjs.Bitmap(queue.getResult("wood_brand"));
-	var ctn_scalex = stage_width/500;
-	var ctn_scaley = stage_height*0.8/500;
+	var ctn_scalex = stage_width/440;
+	var ctn_scaley = stage_height*0.8/450;
 	rules.addChild(rules_brand);
 	rules.regX=250;
 	rules.regY=250;
@@ -356,7 +362,50 @@ function singlemode(){
 	main_ui.addChild(main_block);
 	main_block.addEventListener("click",function(){/*This is a blackhole*/});
 	//Draw single mode ui here
-	
+	var singlemode_ui = new createjs.Container();
+	mode_ui.addChild(singlemode_ui);
+	var singlemode_bg = new createjs.Bitmap(queue.getResult("singlemode_background"));
+	singlemode_ui.addChild(singlemode_bg);
+ 	singlemode_bg.scaleX = stage_width/752;
+	singlemode_bg.scaleY = stage_height/1000;
+	singlemode_ui.alpha = 0;
+	createjs.Tween.get(singlemode_ui).to({alpha: 1},500).call(function(){}); 
+	var gear = new createjs.Container();
+	singlemode_ui.addChild(gear);
+	var gear1 = new createjs.Bitmap(queue.getResult("gear1"));
+	var gear2 = new createjs.Bitmap(queue.getResult("gear2"));
+	var gear3 = new createjs.Bitmap(queue.getResult("gear3"));
+	var gear4 = new createjs.Bitmap(queue.getResult("gear4"));
+	var gear5 = new createjs.Bitmap(queue.getResult("gear5"));
+	gear.addChild(gear1,gear2,gear3,gear4,gear5);
+	gear1.regX = gear1.regY = 147.5;
+	gear2.regX = gear2.regY = 105;
+	gear3.regX = 66.5;
+	gear3.regY = 67;
+	gear4.regX = gear4.regY = 94;
+	gear5.regX = gear5.regY = 77.5;
+	gear1.x = 150.5;
+	gear1.y = 147.5;
+	gear2.x = 331.5;
+	gear2.y = 315.5;
+	gear3.x = 482.5;
+	gear3.y = 231.5;
+	gear4.x = 642;
+	gear4.y = 253;
+	gear5.x = 802.5;
+	gear5.y = 192.5;
+	gear.x = -58;
+	gear.y = -222;
+	var gear1_speed = 20000;
+	var gear2_speed = gear1_speed/(gear1.regX/gear2.regX);
+	var gear3_speed = gear2_speed/(gear2.regX/gear3.regX);
+	var gear4_speed = gear3_speed/(gear3.regX/gear4.regX);
+	var gear5_speed = gear4_speed/(gear4.regX/gear5.regX);
+ 	createjs.Tween.get(gear1,{loop:true}).to({rotation:360},gear1_speed).call(function(){});
+	createjs.Tween.get(gear2,{loop:true}).to({rotation:-360},gear2_speed).call(function(){});
+	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed).call(function(){});
+	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed).call(function(){});
+	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed).call(function(){}); 
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
