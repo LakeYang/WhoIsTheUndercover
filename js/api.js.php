@@ -69,6 +69,7 @@ $(document).ready(function(){
 
 //User clicked enter, initiate canvas.
 function init(){
+	netconn("create_room",{"usernum":10,"spynum":1,"wordtype":"random"},function(){})
 	//Parse json to array first
 	words = [];
 	var temp = queue.getResult("words");
@@ -405,7 +406,7 @@ function singlemode(){
 	createjs.Tween.get(gear2,{loop:true}).to({rotation:-360},gear2_speed).call(function(){});
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed).call(function(){});
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed).call(function(){});
-	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed).call(function(){}); 
+	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed).call(function(){});
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
@@ -413,7 +414,7 @@ function singlemode(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
-			singlestart(3,1,0,wordssss,1);
+			singlestart(3,1,0,wordssss);
 		});
 	});
 }
@@ -424,27 +425,29 @@ function networkmode(){
 }
 
 //Single mode game start
-function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
+function singlestart(player_num,spy_num,white_num,wordarr,restarted){
+	game_ui.removeAllChildren();
 	var folk_num = player_num - spy_num - white_num;
-	//block first
-	var main_block = new createjs.Shape();
-	main_block.alpha = 0;
-	main_block.graphics.beginFill("black").drawRect(0, 0, stage_width, stage_height);
-	mode_ui.addChild(main_block);
-	main_block.addEventListener("click",function(){/*This is a blackhole*/});
-	//Animation first
 	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
 	ctn_back.scaleX = stage_width/360;
 	ctn_back.scaleY = stage_height/640;
 	game_ui.addChild(ctn_back);
-	
-	game_ui.x = stage_width;
-	createjs.Tween.get(mode_ui).to({x:-stage_width},500);
-	createjs.Tween.get(game_ui).to({x:0},500).call(function(){
+	if(!restarted){
+		game_ui.x = stage_width;
+		//block first
+		var main_block = new createjs.Shape();
+		main_block.alpha = 0;
+		main_block.graphics.beginFill("black").drawRect(0, 0, stage_width, stage_height);
+		mode_ui.addChild(main_block);
+		main_block.addEventListener("click",function(){/*This is a blackhole*/});
+		//Animation first
+		createjs.Tween.get(game_ui).to({x:0},500);
+	}
+	createjs.Tween.get(mode_ui).to({x:-stage_width},500).call(function(){
 		mode_ui.removeAllChildren();
 		mode_ui.x = 0;
 		//Remove headimgquery if defined
-		if(headimgquery){
+		if(headimgquery && !restarted){
 			headimgquery.removeAll();
 		}
 		//Start distribute card and take photos
@@ -660,6 +663,16 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 													})
 													createjs.Tween.get(cardlist[ranpeople]).to({},1000).to({x:stage_width/2-150*showcardword.showscale,y:stage_height/2-200*showcardword.showscale,scaleX:showcardword.showscale,scaleY:showcardword.showscale},1000,createjs.Ease.cubicOut).call(function(){
 														playerlist[ranpeople].text += " <?php echo trans('Obediently Punished'); ?>";
+														shapelist[ranpeople].addEventListener("click", function(evt){
+															cconfirm(punishments[Math.floor(Math.random()*punishments.length)],function(s){
+																if(s){
+																	singlestart(player_num,spy_num,white_num,wordarr,1);
+																}else{
+																	modeselect();
+																}
+															},"<?php echo trans('Play again'); ?>","<?php echo trans('Main menu'); ?>");
+															evt.remove();
+														});
 													});
 												}else{
 													modeselect();
@@ -690,12 +703,16 @@ function singlestart(player_num,spy_num,white_num,wordarr,mustphoto){
 					}
 				});
 			});
-		});
+		},restarted);
 	});
 }
 
 //function used in singlestart() used to take photo.
-function takephotos(num,callbackFunction,nownum,lastarray){
+function takephotos(num,callbackFunction,immjump,nownum,lastarray){
+	if(immjump){
+		callbackFunction(takephotos.lasttemp);
+		return 0;
+	}
 	if(!takephotos.phptoid){
 		takephotos.phptoid = 0;
 	}
@@ -710,20 +727,21 @@ function takephotos(num,callbackFunction,nownum,lastarray){
 				if(res){
 					headimgquery.loadFile({id:"userheadimg"+takephotos.phptoid,src:res,type:createjs.AbstractLoader.IMAGE});
 					lastarray[nownum] = "userheadimg"+takephotos.phptoid;
-					takephotos(num,callbackFunction,nownum+1,lastarray);
+					takephotos(num,callbackFunction,immjump,nownum+1,lastarray);
 				}else{
 					cconfirm("<?php echo trans('Player %1 failed to take a photo. Retry or use random head portrait?'); ?>".replace(/%1/,nownum),function(s){
 						if(s){
-							takephotos(num,callbackFunction,nownum,lastarray);
+							takephotos(num,callbackFunction,immjump,nownum,lastarray);
 						}else{
 							lastarray[nownum] = "random";
-							takephotos(num,callbackFunction,nownum+1,lastarray);
+							takephotos(num,callbackFunction,immjump,nownum+1,lastarray);
 						}
 					},"<?php echo trans('Retry'); ?>","<?php echo trans('Random'); ?>");
 				}
 			})
 		});
 	}else{
+		takephotos.lasttemp = lastarray;
 		if(headimgquery.getItems(false).length){
 			if(headimgquery.loaded){
 				callbackFunction(lastarray);
@@ -876,4 +894,36 @@ function arrayselect(pickups,numbers){
 	return outputarr.sort();
 }
 
+function netconn(TargetName,postData,callbackFunction){
+	$.ajax({
+		type: "POST",
+		url: "apis/"+TargetName+".php",
+		data: postData,
+		success: function(ReturnData,Status){
+			if(typeof(ReturnData)!="string"){
+				callbackFunction(ReturnData);
+				return 0;
+			}
+			var parsed = JSON.parse(ReturnData);
+			try{
+				var parsed = JSON.parse(ReturnData);
+			}catch(e){
+				if(confirm("<?php echo trans('Server have returned a non-JSON response. The most likely reason is the administrator incorrect configured.'); ?>\n<?php echo trans('Server respond was'); ?> : \n"+ReturnData+"\n<?php echo trans('Retry'); ?>?")){
+					netconn(TargetName,postData,callbackFunction);
+				}else{
+					callbackFunction(false);
+				}
+				return 0;
+			}
+			callbackFunction(parsed);
+		},
+		error: function(xhr,textStatus,errorThrown){
+			if(confirm("<?php echo trans('An error occured when requesting and processing data from server'); ?>"+"\n"+"<?php echo trans('Target'); ?> : apis/"+TargetName+".php\n<?php echo trans('Error'); ?> : "+errorThrown+"\n<?php echo trans('Retry'); ?>?")){
+				netconn(TargetName,postData,callbackFunction);
+			}else{
+				callbackFunction(false);
+			}
+		}
+	});
+}
 //Who will be the next?

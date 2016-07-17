@@ -26,6 +26,11 @@ if(isset($_GET['code']) && WechatEnabled){
 	header('Location: https://open.weixin.qq.com/connect/oauth2/authorize?appid='.APPID.'&redirect_uri='.$url.'&response_type=code&scope=snsapi_userinfo#wechat_redirect');
 	exit;
 }
+session_start();
+$_SESSION['started'] = 1;
+$_SESSION['openid'] = $UserOpenID;
+$_SESSION['nickname'] = $UserName;
+$_SESSION['userimg'] = $UserImg;
 ?>
 <!doctype html>
 <html>

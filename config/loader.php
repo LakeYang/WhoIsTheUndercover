@@ -97,7 +97,4 @@ if(WechatEnabled){
 	$signature = sha1($signature);
 }
 
-
-
-
 ?>
