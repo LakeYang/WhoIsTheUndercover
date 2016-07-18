@@ -69,7 +69,7 @@ $(document).ready(function(){
 
 //User clicked enter, initiate canvas.
 function init(){
-	netconn("create_room",{"usernum":10,"spynum":1,"wordtype":"random"},function(){})
+	netconn("create_room",{"usernum":10,"spynum":1},function(){});
 	//Parse json to array first
 	words = [];
 	var temp = queue.getResult("words");
@@ -902,6 +902,13 @@ function netconn(TargetName,postData,callbackFunction){
 		data: postData,
 		success: function(ReturnData,Status){
 			if(typeof(ReturnData)!="string"){
+				if(ReturnData.status=="error"){
+					if(confirm("<?php echo trans('Server returned an error.'); ?>\n"+"<?php echo trans('Target'); ?> : apis/"+TargetName+".php\n<?php echo trans('Error Message'); ?> : \n"+ReturnData.errmsg+"\n<?php echo trans('Retry'); ?>?")){
+						netconn(TargetName,postData,callbackFunction);
+					}else{
+						callbackFunction(false);
+					}
+				}
 				callbackFunction(ReturnData);
 				return 0;
 			}

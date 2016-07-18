@@ -26,7 +26,6 @@ if(!(is_numeric($_POST['usernum']) && $_POST['usernum']>=3 && $_POST['usernum']<
 	exit;
 }
 $usernum = $_POST['usernum'];
-$openid = $_SESSION['openid'];
 if(!isset($_POST['password'])){
 	$password = "";
 }else{
@@ -37,7 +36,7 @@ if(!isset($_POST['wordtype'])){
 	exit;
 }
 $userArray = array();
-array_push($userArray,array($openid,$_SESSION['nickname'],$_SESSION['userimg']));
+array_push($userArray,array($_SESSION['openid'],$_SESSION['nickname'],$_SESSION['userimg']));
 for($i=1;$i<$usernum;$i++){
 	array_push($userArray,0);
 }

@@ -24,6 +24,8 @@
 "Play again":"再来一局",
 "Target":"目标",
 "Error":"错误",
+"Server returned an error.":"服务器返回了一个错误。",
+"Error Message":"错误信息",
 "Server have returned a non-JSON response. The most likely reason is the administrator incorrect configured.":"服务器的回复不是JSON，这最可能的原因是管理员配置错误。",
 "Server respond was":"服务器的回复是",
 "An error occured when requesting and processing data from server":"向服务器请求数据或处理时发生错误",
