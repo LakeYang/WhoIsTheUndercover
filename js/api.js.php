@@ -379,6 +379,7 @@ function singlemode(){
 	var gear4 = new createjs.Bitmap(queue.getResult("gear4"));
 	var gear5 = new createjs.Bitmap(queue.getResult("gear5"));
 	gear.addChild(gear1,gear2,gear3,gear4,gear5);
+	gear.scaleX = gear.scaleY = stage_width/880*1.2;
 	gear1.regX = gear1.regY = 147.5;
 	gear2.regX = gear2.regY = 105;
 	gear3.regX = 66.5;
@@ -395,8 +396,8 @@ function singlemode(){
 	gear4.y = 253;
 	gear5.x = 802.5;
 	gear5.y = 192.5;
-	gear.x = -58;
-	gear.y = -222;
+	gear.x = -stage_width*0.15;
+	gear.y = -420*gear.scaleY*0.45;
 	var gear1_speed = 20000;
 	var gear2_speed = gear1_speed/(gear1.regX/gear2.regX);
 	var gear3_speed = gear2_speed/(gear2.regX/gear3.regX);
