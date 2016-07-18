@@ -6,17 +6,12 @@ if(!isset($_SESSION['started'])){
 	echo '{"status":"error","errmsg":"session is not started yet"}';
 	exit;
 }
-if(!(is_numeric($_POST['usernum']) && $_POST['usernum']>=3 && $_POST['usernum']<=12)){
-	echo '{"status":"error","errmsg":"param usernum invalid"}';
-	exit;
-}
-$usernum = $_POST['usernum'];
-if(!(is_numeric($_POST['spynum']) && $_POST['spynum']>=0 && $_POST['spynum']<=12)){
+if(!(isset($_POST['spynum']) && is_numeric($_POST['spynum']) && $_POST['spynum']>=0 && $_POST['spynum']<=12)){
 	echo '{"status":"error","errmsg":"param spynum invalid"}';
 	exit;
 }
 $spynum = $_POST['spynum'];
-if(!(is_numeric($_POST['whitenum']) && $_POST['whitenum']>=0 && $_POST['whitenum']<=12)){
+if(!(isset($_POST['whitenum']) && is_numeric($_POST['whitenum']) && $_POST['whitenum']>=0 && $_POST['whitenum']<=12)){
 	$whitenum = 0;
 }else{
 	$whitenum = $_POST['whitenum'];
@@ -44,7 +39,11 @@ $userArray = $mysqli->real_escape_string(serialize($userArray));
 $timestamp = time();
 $config = array("password"=>$password,"wordtype"=>"","spynum"=>$spynum,"whitenum"=>$whitenum);
 $config = $mysqli->real_escape_string(serialize($config));
-$sql = 'INSERT INTO `'.TABLE_PREFIX."_Rooms` (`ID`, `users`, `createtime`, `config`) VALUES (NULL, '$userArray', '$timestamp', '$config');";
+$chats = array();
+$chats[0] = 1;
+$chats[1] = array($_SESSION['nickname'],trans('I just created this room. Have fun!'),$timestamp);
+$chats = $mysqli->real_escape_string(serialize($chats));
+$sql = 'INSERT INTO `'.TABLE_PREFIX."_Rooms` (`ID`, `users`, `createtime`, `config`, `chats`) VALUES (NULL, '$userArray', '$timestamp', '$config', '$chats');";
 if(!$mysqli->query($sql)){
 	echo '{"status":"error","errmsg":"Database insert failure"}';
 	//$mysqli->sqlstate

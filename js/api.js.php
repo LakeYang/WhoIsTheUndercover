@@ -69,7 +69,6 @@ $(document).ready(function(){
 
 //User clicked enter, initiate canvas.
 function init(){
-	netconn("create_room",{"usernum":10,"spynum":1},function(){});
 	//Parse json to array first
 	words = [];
 	var temp = queue.getResult("words");
@@ -912,7 +911,6 @@ function netconn(TargetName,postData,callbackFunction){
 				callbackFunction(ReturnData);
 				return 0;
 			}
-			var parsed = JSON.parse(ReturnData);
 			try{
 				var parsed = JSON.parse(ReturnData);
 			}catch(e){

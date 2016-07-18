@@ -11,47 +11,42 @@ if(!(isset($_POST['roomid']) && is_numeric($_POST['roomid']) && $_POST['roomid']
 	exit;
 }
 $roomid = $_POST['roomid'];
-if(!isset($_POST['password'])){
-	$password = "";
-}else{
-	$password = $_POST['password'];
+if(!(isset($_POST['message']) && $_POST['message']!="")){
+	echo '{"status":"error","errmsg":"param message invalid"}';
+	exit;
 }
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'_Rooms` WHERE `ID` = '.$roomid;
 $res = $mysqli->query($sql);
 if($res && $row = $res->fetch_row()){
 	@$userarray = unserialize($row[1]);
-	@$config = unserialize($row[3]);
-	if(!$userarray || !$config){
+	@$chatsarray = unserialize($row[4]);
+	if(!$userarray || !$chatsarray){
 		echo '{"status":"error","errmsg":"string in Database cannot be unserialized"}';
-		exit;
-	}
-	if($config["password"] != $password){
-		echo '{"status":"fail","failcode":1,"failmsg":"invalid password"}';
 		exit;
 	}
 	foreach($userarray as $value){
 		if($value != 0 && $value[0] == $_SESSION['openid']){
-			echo '{"status":"ok","roomid":'.$roomid.',"position":'.($key+1).'}';
-			exit;
-		}
-	}
-	foreach($userarray as $key=>$value){
-		if($value == 0){
-			$userarray[$key]=array($_SESSION['openid'],$_SESSION['nickname'],$_SESSION['userimg']);
-			$userarray = $mysqli->real_escape_string(serialize($userarray));
-			$sql = "UPDATE  `".TABLE_PREFIX."_Rooms` SET  `users` =  '$userarray' WHERE  `".TABLE_PREFIX."_Rooms`.`ID` = ".$roomid;
+			if($chatsarray[0] == 100){
+				$chatsarray[0] = 1;
+				$chatsarray[1] = array($_SESSION['nickname'],$_POST['message'],time());
+			}else{
+				$chatsarray[0]++;
+				$chatsarray[$chatsarray[0]] = array($_SESSION['nickname'],$_POST['message'],time());
+			}
+			$chatsarray = $mysqli->real_escape_string(serialize($chatsarray));
+			$sql = "UPDATE  `".TABLE_PREFIX."_Rooms` SET  `chats` =  '$chatsarray' WHERE  `".TABLE_PREFIX."_Rooms`.`ID` = ".$roomid;
 			if($mysqli->query($sql) === TRUE){
-				echo '{"status":"ok","roomid":'.$roomid.',"position":'.($key+1).'}';
+				echo '{"status":"ok"}';
 				exit;
 			}
 			echo '{"status":"error","errmsg":"Database update failure"}';
 			exit;
 		}
 	}
-	echo '{"status":"error","errmsg":"unknown error"}';
+	echo '{"status":"error","errmsg":"you are not in this room"}';
 	exit;
 }else{
-	echo '{"status":"fail","failcode":0,"failmsg":"room not found"}';
+	echo '{"status":"error","errmsg":"target room not found"}';
 	exit;
 }
 ?>

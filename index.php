@@ -28,9 +28,9 @@ if(isset($_GET['code']) && WechatEnabled){
 }
 session_start();
 $_SESSION['started'] = 1;
-$_SESSION['openid'] = $UserOpenID;
-$_SESSION['nickname'] = $UserName;
-$_SESSION['userimg'] = $UserImg;
+@$_SESSION['openid'] = $UserOpenID;
+@$_SESSION['nickname'] = $UserName;
+@$_SESSION['userimg'] = $UserImg;
 ?>
 <!doctype html>
 <html>
