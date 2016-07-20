@@ -52,6 +52,7 @@ $(document).ready(function(){
 		{id:"modeselect_background", src:"assets/image/modeselect_bg.png"},
 		{id:"wood_brand", src:"assets/image/rules.png"},
 		{id:"singlemode_background", src:"assets/image/singlemode_background.png"},
+		{id:"singlemode_bottom", src:"assets/image/singlemode_bottom.png"},
 		{id:"gear1", src:"assets/image/gear1.png"},
 		{id:"gear2", src:"assets/image/gear2.png"},
 		{id:"gear3", src:"assets/image/gear3.png"},
@@ -271,7 +272,28 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	});
 	cconfirm.counter++;
 }
-
+//canvas scrollbar function
+function scrollbar(min_num, max_num){
+		var scrollbar_ui = new createjs.Container();
+		mode_ui.addChild(scrollbar_ui);
+		var bar_text = new createjs.Text("3 4 5 6 7 8 9 10 11 12", "50px Arial", "#ff0000");
+		scrollbar_ui.addChild(bar_text);
+		scrollbar_ui.x = stage_width/6;
+		scrollbar_ui.y = stage_height/3;
+		var bar_mask = new createjs.Shape();
+		scrollbar_ui.addChild(bar_mask);
+		bar_mask.graphics.beginFill("rgba(0,0,0,0)").drawRect(0,0,50,50);
+		bar_text.mask = bar_mask;
+/* 							masklist[i] = new createjs.Shape();
+					masklist[i].graphics.beginFill("rgba(0,0,0,0)").drawRect(10,20,280,280);
+					cardlist[i].addChild(masklist[i]);
+					imglist[i].mask = masklist[i]; */
+/* 			rules_text.x = 260;
+	rules_text.y = 200;
+	rules_text.maxWidth=rules_text.lineWidth=300;
+	rules_text.textBaseline = "hanging";
+	rules_text.textAlign = "center"; */
+}
 //canvas modeselect function
 function modeselect(){
 	var btnsingletext = "<?php echo trans('Single'); ?>";
@@ -366,10 +388,15 @@ function singlemode(){
 	mode_ui.addChild(singlemode_ui);
 	var singlemode_bg = new createjs.Bitmap(queue.getResult("singlemode_background"));
 	singlemode_ui.addChild(singlemode_bg);
- 	singlemode_bg.scaleX = stage_width/752;
-	singlemode_bg.scaleY = stage_height/1000;
+ 	singlemode_bg.scaleX = stage_width/500;
+	singlemode_bg.scaleY = stage_height/665;
 	singlemode_ui.alpha = 0;
 	createjs.Tween.get(singlemode_ui).to({alpha: 1},500).call(function(){}); 
+	var singlemode_bottom = new createjs.Bitmap(queue.getResult("singlemode_bottom"));
+	singlemode_ui.addChild(singlemode_bottom);
+	singlemode_bottom.scaleX = singlemode_bottom.scaleY = stage_width/1383*1.7;
+	singlemode_bottom.x = -0.35*stage_width;
+	singlemode_bottom.y = stage_height - 206*singlemode_bottom.scaleY;
 	var gear = new createjs.Container();
 	singlemode_ui.addChild(gear);
 	var gear1 = new createjs.Bitmap(queue.getResult("gear1"));
@@ -402,21 +429,23 @@ function singlemode(){
 	var gear3_speed = gear2_speed/(gear2.regX/gear3.regX);
 	var gear4_speed = gear3_speed/(gear3.regX/gear4.regX);
 	var gear5_speed = gear4_speed/(gear4.regX/gear5.regX);
- 	createjs.Tween.get(gear1,{loop:true}).to({rotation:360},gear1_speed).call(function(){});
-	createjs.Tween.get(gear2,{loop:true}).to({rotation:-360},gear2_speed).call(function(){});
-	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed).call(function(){});
-	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed).call(function(){});
-	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed).call(function(){});
+ 	createjs.Tween.get(gear1,{loop:true}).to({rotation:360},gear1_speed);
+	createjs.Tween.get(gear2,{loop:true}).to({rotation:-360},gear2_speed);
+	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
+	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
+	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
+	scrollbar(1,1);
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
-	createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
+/* 		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
 			singlestart(3,1,0,wordssss);
 		});
-	});
+	}); */
+	createjs.Tween.get(mode_ui).to({x:0},500);
 }
 
 //Network mode main setting page
@@ -911,6 +940,7 @@ function netconn(TargetName,postData,callbackFunction){
 				callbackFunction(ReturnData);
 				return 0;
 			}
+			var parsed = JSON.parse(ReturnData);
 			try{
 				var parsed = JSON.parse(ReturnData);
 			}catch(e){
