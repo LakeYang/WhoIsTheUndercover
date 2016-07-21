@@ -26,8 +26,8 @@ if(!isset($_POST['password'])){
 }else{
 	$password = $_POST['password'];
 }
-if(!isset($_POST['wordtype'])){
-	echo '{"status":"error","errmsg":"param wordtype undefined"}';
+if(!isset($_POST['words']) && !is_array($_POST['words'])){
+	echo '{"status":"error","errmsg":"param words invalid"}';
 	exit;
 }
 $userArray = array();
@@ -43,7 +43,7 @@ $chats = array();
 $chats[0] = 1;
 $chats[1] = array($_SESSION['nickname'],trans('I just created this room. Have fun!'),$timestamp);
 $chats = $mysqli->real_escape_string(serialize($chats));
-$status = array(0);
+$status = array(0,0,0,$_POST['words']);
 $status = $mysqli->real_escape_string(serialize($status));
 $sql = 'INSERT INTO `'.TABLE_PREFIX."_Rooms` (`ID`, `users`, `createtime`, `config`, `chats`, `status`) VALUES (NULL, '$userArray', '$timestamp', '$config', '$chats', '$status');";
 if(!$mysqli->query($sql)){
