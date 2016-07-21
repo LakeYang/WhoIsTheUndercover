@@ -58,6 +58,7 @@ $(document).ready(function(){
 		{id:"gear3", src:"assets/image/gear3.png"},
 		{id:"gear4", src:"assets/image/gear4.png"},
 		{id:"gear5", src:"assets/image/gear5.png"},
+		{id:"scrollbar_bg",src:"assets/image/scrollbar_bg.png"},
 		{id:"card_background", src:"assets/image/card_background.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
@@ -273,26 +274,55 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cconfirm.counter++;
 }
 //canvas scrollbar function
-function scrollbar(min_num, max_num){
-		var scrollbar_ui = new createjs.Container();
-		mode_ui.addChild(scrollbar_ui);
-		var bar_text = new createjs.Text("3 4 5 6 7 8 9 10 11 12", "50px Arial", "#ff0000");
-		scrollbar_ui.addChild(bar_text);
-		scrollbar_ui.x = stage_width/6;
-		scrollbar_ui.y = stage_height/3;
-		var bar_mask = new createjs.Shape();
-		scrollbar_ui.addChild(bar_mask);
-		bar_mask.graphics.beginFill("rgba(0,0,0,0)").drawRect(0,0,50,50);
-		bar_text.mask = bar_mask;
-/* 							masklist[i] = new createjs.Shape();
-					masklist[i].graphics.beginFill("rgba(0,0,0,0)").drawRect(10,20,280,280);
-					cardlist[i].addChild(masklist[i]);
-					imglist[i].mask = masklist[i]; */
-/* 			rules_text.x = 260;
-	rules_text.y = 200;
-	rules_text.maxWidth=rules_text.lineWidth=300;
-	rules_text.textBaseline = "hanging";
-	rules_text.textAlign = "center"; */
+function scrollbar(min_num, max_num,x,y,scale){
+	var offset = 0;
+	var num = [];
+	for(var i = min_num ; i <= max_num ; i++)
+		num[i-min_num] =  i;
+	var scrollbar_ui = new createjs.Container();
+	scrollbar_ui.x = x;
+	scrollbar_ui.y = y;
+	scrollbar_ui.regX = scrollbar_ui.regY = 0;
+	scrollbar_ui.scaleX = scale;
+	scrollbar_ui.scaleY = 55/50*scale;
+	var scrollbar_bg = new createjs.Bitmap(queue.getResult("scrollbar_bg"));
+	scrollbar_ui.addChild(scrollbar_bg);
+	scrollbar_bg.scaleX = 110/150;
+	scrollbar_bg.scaleY = 65/38;
+	var bar = new createjs.Container();
+	scrollbar_ui.addChild(bar);
+	var bar_bg = new createjs.Shape();
+	bar.addChild(bar_bg);
+	bar_bg.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(0,8,55*(10-min_num+1)+40*(i-9)+25*(i-10),50);
+	var bar_text = [];
+	for(var i = min_num; i <= max_num; i++){
+		bar_text[i-min_num] = new createjs.Text(i, "50px Arial", "white");
+		bar_text[i-min_num].y = 4;
+		bar_text[0].x = 40;
+		if(i<10)
+			bar_text[i-min_num].x = 55*(i-min_num)+40;
+		if(i>=10)
+			bar_text[i-min_num].x = 55*(10-min_num)+40*(i-9)+25*(i-10);
+		bar.addChild(bar_text[i-min_num]);
+	}
+/* 	var bar_text = new createjs.Text(num.join(' ') , "50px Arial", "#ff0000");
+	bar.addChild(bar_text);
+	bar_text.x =14; */
+	var bar_mask = new createjs.Shape();
+	scrollbar_ui.addChild(bar_mask);
+	bar_mask.graphics.beginFill("rgba(0,0,0,0)").drawRect(5,0,100,65);
+	bar.mask = bar_mask;
+	bar.on("mousedown",function(evt){
+		offset = this.x - evt.stageX/scale;
+	});
+	bar.on("pressmove",function(evt){
+		this.x = evt.stageX/scale + offset;
+		if(this.x < -55*(10-min_num+7)+40*(i-9)+25*(i-10))
+			this.x = -55*(10-min_num+7)+40*(i-9)+25*(i-10);
+		if(this.x > 0)
+			this.x = 0;
+	});
+	return scrollbar_ui;
 }
 //canvas modeselect function
 function modeselect(){
@@ -434,7 +464,8 @@ function singlemode(){
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
 	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
-	scrollbar(1,1);
+	a = scrollbar(3,12,10,10,5);
+	mode_ui.addChild(a); 
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
