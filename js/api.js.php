@@ -293,16 +293,16 @@ function scrollbar(min_num, max_num,x,y,scale){
 	scrollbar_ui.addChild(bar);
 	var bar_bg = new createjs.Shape();
 	bar.addChild(bar_bg);
-	bar_bg.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(0,8,55*(10-min_num+1)+40*(i-9)+25*(i-10),50);
+	bar_bg.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(0,8,40+55*(10-min_num)+80*(max_num-10)+85,50);
 	var bar_text = [];
 	for(var i = min_num; i <= max_num; i++){
 		bar_text[i-min_num] = new createjs.Text(i, "50px Arial", "white");
 		bar_text[i-min_num].y = 4;
 		bar_text[0].x = 40;
-		if(i<10)
-			bar_text[i-min_num].x = 55*(i-min_num)+40;
-		if(i>=10)
-			bar_text[i-min_num].x = 55*(10-min_num)+40*(i-9)+25*(i-10);
+		if(i<=10)
+			bar_text[i-min_num].x = 40+55*(i-min_num);
+		if(i>10)
+			bar_text[i-min_num].x = 40+55*(10-min_num)+80*(i-10);
 		bar.addChild(bar_text[i-min_num]);
 	}
 /* 	var bar_text = new createjs.Text(num.join(' ') , "50px Arial", "#ff0000");
@@ -317,8 +317,8 @@ function scrollbar(min_num, max_num,x,y,scale){
 	});
 	bar.on("pressmove",function(evt){
 		this.x = evt.stageX/scale + offset;
-		if(this.x < -55*(10-min_num+7)+40*(i-9)+25*(i-10))
-			this.x = -55*(10-min_num+7)+40*(i-9)+25*(i-10);
+		if(this.x < -(40+55*(10-min_num)+80*(max_num-11)+55))
+			this.x = -(40+55*(10-min_num)+80*(max_num-11)+55);
 		if(this.x > 0)
 			this.x = 0;
 	});
@@ -464,7 +464,7 @@ function singlemode(){
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
 	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
-	a = scrollbar(3,12,10,10,5);
+	a = scrollbar(3,20,10,10,5);
 	mode_ui.addChild(a); 
 	//ui animation
 	mode_ui.x = stage_width;
