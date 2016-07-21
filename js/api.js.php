@@ -936,6 +936,7 @@ function netconn(TargetName,postData,callbackFunction){
 					}else{
 						callbackFunction(false);
 					}
+					return 0;
 				}
 				callbackFunction(ReturnData);
 				return 0;

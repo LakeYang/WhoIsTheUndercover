@@ -20,7 +20,7 @@ $res = $mysqli->query($sql);
 if($res && $row = $res->fetch_row()){
 	@$userarray = unserialize($row[1]);
 	@$chatsarray = unserialize($row[4]);
-	if(!$userarray || !$chatsarray){
+	if(!is_array($userarray) || !is_array($chatsarray)){
 		echo '{"status":"error","errmsg":"string in Database cannot be unserialized"}';
 		exit;
 	}

@@ -11,30 +11,34 @@ if(!(isset($_POST['roomid']) && is_numeric($_POST['roomid']) && $_POST['roomid']
 	exit;
 }
 $roomid = $_POST['roomid'];
-if(!(isset($_POST['message']) && $_POST['message']!="")){
-	echo '{"status":"error","errmsg":"param message invalid"}';
+if(!(isset($_POST['target']) && is_numeric($_POST['target']) && $_POST['target']>=0 && $_POST['target']<=12)){
+	echo '{"status":"error","errmsg":"param target invalid"}';
 	exit;
 }
+$target = $_POST['target'];
 $sql = 'SELECT * FROM `'.TABLE_PREFIX.'_Rooms` WHERE `ID` = '.$roomid;
 $res = $mysqli->query($sql);
 if($res && $row = $res->fetch_row()){
 	@$userarray = unserialize($row[1]);
-	@$chatsarray = unserialize($row[4]);
-	if(!is_array($userarray) || !is_array($chatsarray)){
+	@$status = unserialize($row[5]);
+	if(!is_array($userarray) || !is_array($status)){
 		echo '{"status":"error","errmsg":"string in Database cannot be unserialized"}';
 		exit;
 	}
-	foreach($userarray as $value){
+	foreach($userarray as $key=>$value){
 		if($value != 0 && $value[0] == $_SESSION['openid']){
-			if($chatsarray[0] == 100){
-				$chatsarray[0] = 1;
-				$chatsarray[1] = array($_SESSION['nickname'],$_POST['message'],time());
-			}else{
-				$chatsarray[0]++;
-				$chatsarray[$chatsarray[0]] = array($_SESSION['nickname'],$_POST['message'],time());
+			$userid = $key+1;
+			if($status[0] == 0){
+				echo '{"status":"error","errmsg":"room not initiated"}';
+				exit;
 			}
-			$chatsarray = $mysqli->real_escape_string(serialize($chatsarray));
-			$sql = "UPDATE  `".TABLE_PREFIX."_Rooms` SET  `chats` =  '$chatsarray' WHERE  `".TABLE_PREFIX."_Rooms`.`ID` = ".$roomid;
+			if($status[1][$userid]!=0){
+				echo '{"status":"error","errmsg":"you have already voted this round"}';
+				exit;
+			}
+			$status[1][$userid] = $target;
+			$status = $mysqli->real_escape_string(serialize($status));
+			$sql = "UPDATE  `".TABLE_PREFIX."_Rooms` SET  `status` =  '$status' WHERE  `".TABLE_PREFIX."_Rooms`.`ID` = ".$roomid;
 			if($mysqli->query($sql) === TRUE){
 				echo '{"status":"ok"}';
 				exit;
@@ -49,4 +53,5 @@ if($res && $row = $res->fetch_row()){
 	echo '{"status":"error","errmsg":"target room not found"}';
 	exit;
 }
+
 ?>

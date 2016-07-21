@@ -43,7 +43,9 @@ $chats = array();
 $chats[0] = 1;
 $chats[1] = array($_SESSION['nickname'],trans('I just created this room. Have fun!'),$timestamp);
 $chats = $mysqli->real_escape_string(serialize($chats));
-$sql = 'INSERT INTO `'.TABLE_PREFIX."_Rooms` (`ID`, `users`, `createtime`, `config`, `chats`) VALUES (NULL, '$userArray', '$timestamp', '$config', '$chats');";
+$status = array(0);
+$status = $mysqli->real_escape_string(serialize($status));
+$sql = 'INSERT INTO `'.TABLE_PREFIX."_Rooms` (`ID`, `users`, `createtime`, `config`, `chats`, `status`) VALUES (NULL, '$userArray', '$timestamp', '$config', '$chats', '$status');";
 if(!$mysqli->query($sql)){
 	echo '{"status":"error","errmsg":"Database insert failure"}';
 	//$mysqli->sqlstate
