@@ -63,6 +63,7 @@ $(document).ready(function(){
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
 		{id:"stamp", src:"assets/audio/stamp.mp3"},
+		{id:"scroll", src:"assets/audio/scroll.mp3"},
 		{id:"flipcard", src:"assets/audio/flipcard.ogg"},
 		{id:"sound_click", src:"assets/audio/click.ogg"}
 	]);
@@ -274,12 +275,16 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cconfirm.counter++;
 }
 //canvas scrollbar function
-function scrollbar(min_num, max_num,x,y,scale){
+function scrollbar(min_num, max_num,x,y,scale,onStateChange){
+	if(!onStateChange){
+	var onStateChange=function(){}
+	}
 	var offset = 0;
 	var num = [];
 	for(var i = min_num ; i <= max_num ; i++)
 		num[i-min_num] =  i;
 	var scrollbar_ui = new createjs.Container();
+	scrollbar_ui.key_num = min_num;
 	scrollbar_ui.x = x;
 	scrollbar_ui.y = y;
 	scrollbar_ui.regX = scrollbar_ui.regY = 0;
@@ -293,34 +298,67 @@ function scrollbar(min_num, max_num,x,y,scale){
 	scrollbar_ui.addChild(bar);
 	var bar_bg = new createjs.Shape();
 	bar.addChild(bar_bg);
-	bar_bg.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(0,8,40+55*(10-min_num)+80*(max_num-10)+85,50);
+	bar_bg.graphics.beginFill("rgba(0,0,0,0.2)").drawRect(-100,8,40+55*(10-min_num)+80*(max_num-10)+85+150,50);
 	var bar_text = [];
 	for(var i = min_num; i <= max_num; i++){
 		bar_text[i-min_num] = new createjs.Text(i, "50px Arial", "white");
 		bar_text[i-min_num].y = 4;
-		bar_text[0].x = 40;
 		if(i<=10)
 			bar_text[i-min_num].x = 40+55*(i-min_num);
 		if(i>10)
 			bar_text[i-min_num].x = 40+55*(10-min_num)+80*(i-10);
 		bar.addChild(bar_text[i-min_num]);
 	}
-/* 	var bar_text = new createjs.Text(num.join(' ') , "50px Arial", "#ff0000");
-	bar.addChild(bar_text);
-	bar_text.x =14; */
 	var bar_mask = new createjs.Shape();
 	scrollbar_ui.addChild(bar_mask);
 	bar_mask.graphics.beginFill("rgba(0,0,0,0)").drawRect(5,0,100,65);
 	bar.mask = bar_mask;
 	bar.on("mousedown",function(evt){
 		offset = this.x - evt.stageX/scale;
+		createjs.Tween.removeTweens(this);
 	});
+	var bar_cover1 = new createjs.Shape();
+	var bar_cover2 = new createjs.Shape();
+	scrollbar_ui.addChild(bar_cover1);
+	scrollbar_ui.addChild(bar_cover2);
+	bar_cover1.graphics.beginLinearGradientFill(["rgba(0,0,0,0.7)","rgba(0,0,0,0.0)"], [0, 1], 0, 0, 35, 0).drawRect(5,5,50,55);
+	bar_cover2.graphics.beginLinearGradientFill(["rgba(0,0,0,0)","rgba(0,0,0,0.7)"], [0, 1], 65, 0, 100, 0).drawRect(55,5,50,55);
 	bar.on("pressmove",function(evt){
 		this.x = evt.stageX/scale + offset;
-		if(this.x < -(40+55*(10-min_num)+80*(max_num-11)+55))
+		if(this.x < -(40+55*(10-min_num)+80*(max_num-11)+55+70))
 			this.x = -(40+55*(10-min_num)+80*(max_num-11)+55);
-		if(this.x > 0)
+		if(this.x > 70)
 			this.x = 0;
+		if(this.x > -40)
+			play("scroll");
+		for(var i = min_num; i < max_num; i++){
+			if(-(bar_text[i-min_num+1].x) < this.x && this.x < -(bar_text[i-min_num].x)){
+				play("scroll");
+			}
+		}
+	});
+	bar.on("pressup",function(evt){
+		if(this.x > -40){
+			createjs.Tween.get(this).to({x:0},500,createjs.Ease.circOut);
+		}
+		for(var i = min_num; i < 9; i++){
+			if(-(bar_text[i-min_num+1].x) < this.x && this.x < -(bar_text[i-min_num].x)){
+				createjs.Tween.get(this).to({x:-(bar_text[i-min_num+1].x-40)},500,createjs.Ease.circOut);
+				evt.target.parent.key_num = i+1;
+				break;
+			}
+		}
+		for(var i = 9; i < max_num; i++){
+			if(-(bar_text[i-min_num+1].x) < this.x && this.x < -(bar_text[i-min_num].x)){
+				createjs.Tween.get(this).to({x:-(bar_text[i-min_num+1].x-25)},500,createjs.Ease.circOut);
+				evt.target.parent.key_num = i+1;
+				break;
+			}
+			if(this.x < -(bar_text[max_num-min_num].x)){
+				createjs.Tween.get(this).to({x:-(bar_text[max_num-min_num].x-25)},500,createjs.Ease.circOut);
+		}
+		}
+		onStateChange(evt.target.parent.key_num);
 	});
 	return scrollbar_ui;
 }
