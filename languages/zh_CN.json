@@ -28,6 +28,8 @@
 "Error Message":"错误信息",
 "I just created this room. Have fun!":"我刚刚创建了这个房间，祝大家游戏快乐！",
 "Room master began the game":"房主开始了游戏",
+"Forget Word":"忘词",
+"Click the player to reveal the word":"点击玩家头像以显示词语",
 "Server have returned a non-JSON response. The most likely reason is the administrator incorrect configured.":"服务器的回复不是JSON，这最可能的原因是管理员配置错误。",
 "Server respond was":"服务器的回复是",
 "An error occured when requesting and processing data from server":"向服务器请求数据或处理时发生错误",

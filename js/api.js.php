@@ -502,18 +502,20 @@ function singlemode(){
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
 	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
-	a = scrollbar(3,20,10,10,5);
+	a = scrollbar(3,20,100,10,2);
 	mode_ui.addChild(a); 
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
-/* 		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
+	
+		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
 			singlestart(3,1,0,wordssss);
 		});
-	}); */
+	}); 
+	
 	createjs.Tween.get(mode_ui).to({x:0},500);
 }
 
@@ -664,10 +666,47 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 			}
 			showcardword(cardlist,wordsarray,function(){
 				calert("<?php echo trans('Please describe the words by order. When a round is complete, click the player card to vote him(her) as an Undercover.'); ?>",function(){
+					//Draw function button
+					var forget_btn = new createjs.Container();
+					game_ui.addChild(forget_btn);
+					var forget_btn_shape = new createjs.Shape();
+					forget_btn_shape.graphics.beginFill("#965632").drawRoundRect(70,50,450,160,25);
+					forget_btn.addChild(forget_btn_shape);
+					var forget_btn_stamp = new createjs.Bitmap(queue.getResult("blue_stamp"));
+					forget_btn.addChild(forget_btn_stamp);
+					var forget_btn_text = new createjs.Text("<?php echo trans('Forget Word'); ?>", "130px Arial", "white");
+					forget_btn_text.x = 200;
+					forget_btn_text.y = 130;
+					forget_btn_text.maxWidth = 320;
+					forget_btn_text.textBaseline = "middle";
+					forget_btn.regX = 295;
+					forget_btn.scaleY=forget_btn.scaleX = Math.min(stage_width,stage_height)/2200;
+					forget_btn.y = stage_height-forget_btn.scaleX*315;
+					forget_btn.x = stage_width/2;
+					forget_btn.addChild(forget_btn_text);
+					singlestart.forget = 0;
+					forget_btn.addEventListener("click", function(evt){
+						if(singlestart.forget){
+							singlestart.forget = 0;
+							forget_btn_text.text = "<?php echo trans('Forget Word'); ?>";
+						}else{
+							calert("<?php echo trans('Click the player to reveal the word'); ?>",function(){evt.target.active = 1;
+								forget_btn_text.text = "<?php echo trans('Cancel'); ?>";
+								singlestart.forget = 1;
+							})
+						}	
+					});
 					//Add mouse event listener
 					for(var i=1;i<=player_num;i++){
 						shapelist[i].no = i;
 						shapelist[i].addEventListener("click", function(evt){
+							if(singlestart.forget){
+								showcardword([0,evt.target.parent],[0,wordsarray[evt.target.no]],function(){
+									forget_btn_text.text = "<?php echo trans('Forget Word'); ?>";
+									singlestart.forget = 0;
+								});
+								return 0;
+							}
 							cconfirm("<?php echo trans('Confirm to vote Player #%1 as an undercover?'); ?>".replace(/%1/,evt.target.no),function(s){
 								if(s){
 									evt.target.removeAllEventListeners("click");
@@ -718,6 +757,8 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 									if(flag){
 										switch(flag){
 											case 1:
+												var endtextshow = "";
+												
 												var endingtxt = "<?php echo trans('Undercovers win! Undercovers: Player %1'); ?>".replace(/%1/,123);
 												break;
 											case 2:
