@@ -512,7 +512,7 @@ function singlemode(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
-			singlestart(3,1,0,wordssss);
+			singlestart(10,2,1,wordssss);
 		});
 	}); 
 	
@@ -758,8 +758,23 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 										switch(flag){
 											case 1:
 												var endtextshow = "";
-												
-												var endingtxt = "<?php echo trans('Undercovers win! Undercovers: Player %1'); ?>".replace(/%1/,123);
+												for(var i=1;i<=player_num;i++){
+													if(wordsarray[0] == wordsarray[i]){
+														endtextshow += i+", ";
+													}
+												}
+												for(var i=1;i<=player_num;i++){
+													if(wordsarray[i] == ""){
+														endtextshow += "  <?php echo trans('Blanks: Player'); ?> ";
+														break;
+													}
+												}
+												for(var i=1;i<=player_num;i++){
+													if(wordsarray[i] == ""){
+														endtextshow += i+", ";
+													}
+												}
+												var endingtxt = "<?php echo trans('Undercovers win! Undercovers: Player %1'); ?>".replace(/%1/,endtextshow);
 												break;
 											case 2:
 												var endingtxt = "<?php echo trans('Blanks win! Undercovers have been eliminated.'); ?>";
