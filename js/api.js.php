@@ -18,6 +18,7 @@ $(document).ready(function(){
 	headimgquery = new createjs.LoadQueue(false);
 	queue.installPlugin(createjs.Sound);
 	queue.on("complete",function(){
+		$("#loadingtext").text("<?php echo trans('Loading complete'); ?>");
 <?php if(WechatEnabled){ ?>
 		wx.config({
 			debug: false,

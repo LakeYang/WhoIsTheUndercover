@@ -63,7 +63,7 @@ user_headimg = "<?php echo $UserImg; ?>";
 
 <body>
 <div id="top_ui">
-<span><?php echo trans('Loading...'); ?></span>
+<span id="loadingtext"><?php echo trans('Loading...'); ?></span>
 <div class="loading_total">
   <div class="loading_progress"></div>
 </div>
