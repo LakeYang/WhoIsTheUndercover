@@ -59,6 +59,10 @@ $(document).ready(function(){
 		{id:"gear4", src:"assets/image/gear4.png"},
 		{id:"gear5", src:"assets/image/gear5.png"},
 		{id:"scrollbar_bg",src:"assets/image/scrollbar_bg.png"},
+		{id:"listbutton",src:"assets/image/list.png"},
+		{id:"list0",src:"assets/image/list0.png"},
+		{id:"switchbg",src:"assets/image/switchbg.png"},
+		{id:"switchbtn",src:"assets/image/switchbtn.png"},
 		{id:"card_background", src:"assets/image/card_background.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
@@ -277,7 +281,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 //canvas scrollbar function
 function scrollbar(min_num, max_num,x,y,scale,onStateChange){
 	if(!onStateChange){
-	var onStateChange=function(){}
+		var onStateChange=function(){}
 	}
 	var offset = 0;
 	var num = [];
@@ -361,6 +365,93 @@ function scrollbar(min_num, max_num,x,y,scale,onStateChange){
 		onStateChange(evt.target.parent.key_num);
 	});
 	return scrollbar_ui;
+}
+//canvas dropdownlist function
+function dropdownlist(item,x,y,scale,onStateChange){
+	if(!onStateChange){
+		var onStateChange=function(){}
+	}
+	var dplist = new createjs.Container();
+	var list = [];
+	var list_bg =[];
+	var list_text = [];
+	var list_num = item.length;
+	var list_text_length = item[0].length;
+	dplist.state = 0;
+	dplist.choose = 0;
+	for(var i = 0; i< list_num;i++){
+		if(item[i].length > list_text_length)
+			list_text_length = item[i].length;
+	}
+	for(var i = list_num-1; i>= 0; i--){
+		list[i] = new createjs.Container;
+		dplist.addChild(list[i]);
+		list[i].x = x;
+		list[i].y = y;
+		list[i].scaleX = list[i].scaleY = scale;
+		list[i].num = i;
+		list_bg[i] = new createjs.Bitmap(queue.getResult("listbutton"));
+		list_bg[0] = new createjs.Bitmap(queue.getResult("list0"));
+		list_bg[i].scaleX = list_text_length*50*2/912;
+		list_bg[i].scaleY = 100/79;
+		list[i].addChild(list_bg[i]);
+		list_text[i] = new createjs.Text(item[i], "50px Arial", "white");
+		list_text[i].x = list_text_length*50;
+		list_text[i].y = 8;
+		list_text[i].textAlign = "center";
+		list[i].addChild(list_text[i]);
+	}
+	for(var i = 0; i<list_num; i++){
+		list[i].on("click",function(evt){
+			if(dplist.state == 0){
+				for(var i = 0; i< list_num; i++){
+					createjs.Tween.get(list[i]).to({y : y+100*scale*i},500,createjs.Ease.circOut);
+					list[i].addChild(list_text[i]);
+				}
+				dplist.state = 1;
+			}
+			else{
+				for(var i = 0; i<list_num; i++)
+					createjs.Tween.get(list[i]).to({y : y},500,createjs.Ease.circOut)
+				dplist.state = 0;
+				list[0].addChild(list_bg[0]);
+				list[0].addChild(list_text[this.num]);
+				this.parent.choose = this.num;
+			}
+			onStateChange(this.parent.choose);		
+		});
+	}
+	return dplist;
+}
+//canvas switchbutton function
+function switchbutton(x,y,scale,onStateChange){
+	if(!onStateChange){
+		var onStateChange=function(){}
+	}
+	var switchbtn = new createjs.Container();
+	var switchstate = 0;
+	switchbtn.x = x;
+	switchbtn.y = y;
+	switchbtn.scaleX = switchbtn.scaleY = scale;
+	var switch_bg = new createjs.Bitmap(queue.getResult("switchbg"));
+	switchbtn.addChild(switch_bg);
+	var switch_btn = new createjs.Bitmap(queue.getResult("switchbtn"));
+	switchbtn.addChild(switch_btn);
+	switch_btn.scaleX = switch_btn.scaleY = 100/109;
+	switch_btn.x = 151;
+	switch_btn.y = 10;
+	switch_btn.on("click",function(evt){
+		if(switchstate == 0){
+			createjs.Tween.get(this).to({x:10},500,createjs.Ease.circOut);
+			switchstate = 1;
+		}
+		else{
+			createjs.Tween.get(this).to({x:151},500,createjs.Ease.circOut);
+			switchstate = 0;
+		}
+		onStateChange(switchstate);
+	});
+	return switchbtn;
 }
 //canvas modeselect function
 function modeselect(){
@@ -502,20 +593,22 @@ function singlemode(){
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
 	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
-	a = scrollbar(3,20,100,10,2);
-	mode_ui.addChild(a); 
+	/* a = scrollbar(3,20,10,10,5);
+	mode_ui.addChild(a);  */
+	/* b = new dropdownlist(["随机随便干嘛","重口味","小清新"],300,500,2);
+	mode_ui.addChild(b); */
+	c = new switchbutton(300,400,2);
+	mode_ui.addChild(c);
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
-	
-		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
+/* 		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
 		main_ui.removeAllChildren();
 		calert("Done",function(){
 			wordssss=['辣椒','芥末'];
 			singlestart(10,2,1,wordssss);
 		});
-	}); 
-	
+	}); */
 	createjs.Tween.get(mode_ui).to({x:0},500);
 }
 
