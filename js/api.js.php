@@ -64,6 +64,7 @@ $(document).ready(function(){
 		{id:"list0",src:"assets/image/list0.png"},
 		{id:"switchbg",src:"assets/image/switchbg.png"},
 		{id:"switchbtn",src:"assets/image/switchbtn.png"},
+		{id:"playbutton",src:"assets/image/playbutton.png"},
 		{id:"card_background", src:"assets/image/card_background.png"},
 		{id:"paper1", src:"assets/audio/paper1.mp3"},
 		{id:"paper2", src:"assets/audio/paper2.mp3"},
@@ -345,6 +346,7 @@ function scrollbar(min_num, max_num,x,y,scale,onStateChange){
 	bar.on("pressup",function(evt){
 		if(this.x > -40){
 			createjs.Tween.get(this).to({x:0},500,createjs.Ease.circOut);
+			evt.target.parent.key_num = 3;
 		}
 		for(var i = min_num; i < 9; i++){
 			if(-(bar_text[i-min_num+1].x) < this.x && this.x < -(bar_text[i-min_num].x)){
@@ -430,7 +432,7 @@ function switchbutton(x,y,scale,onStateChange){
 		var onStateChange=function(){}
 	}
 	var switchbtn = new createjs.Container();
-	var switchstate = 0;
+	switchbtn.state = 0;
 	switchbtn.x = x;
 	switchbtn.y = y;
 	switchbtn.scaleX = switchbtn.scaleY = scale;
@@ -441,18 +443,38 @@ function switchbutton(x,y,scale,onStateChange){
 	switch_btn.scaleX = switch_btn.scaleY = 100/109;
 	switch_btn.x = 151;
 	switch_btn.y = 10;
-	switch_btn.on("click",function(evt){
-		if(switchstate == 0){
+	switch_btn.on("mousedown",function(evt){
+		if(switchbtn.state == 0){
 			createjs.Tween.get(this).to({x:10},500,createjs.Ease.circOut);
-			switchstate = 1;
+			switchbtn.state = 1;
 		}
 		else{
 			createjs.Tween.get(this).to({x:151},500,createjs.Ease.circOut);
-			switchstate = 0;
+			switchbtn.state = 0;
 		}
-		onStateChange(switchstate);
+		onStateChange(switchbtn.state);
 	});
 	return switchbtn;
+}
+//canvas randomwords function
+function randomwords(select){
+	var m;
+	var n;
+	var max;
+	if(select == 0){
+		n = 0;
+		max = words[0].length - 1;
+		}
+	else if(select == 1){
+		n = 1;
+		max = words[1].length - 1;
+		}
+	else{
+		n = Math.floor(Math.random()*2);
+		max = words[n].length - 1;
+	}
+	m = Math.floor(Math.random()*max + 1);
+	return words[n][m];
 }
 //canvas modeselect function
 function modeselect(){
@@ -583,7 +605,7 @@ function singlemode(){
 	gear5.x = 802.5;
 	gear5.y = 192.5;
 	gear.x = -stage_width*0.15;
-	gear.y = -420*gear.scaleY*0.45;
+	gear.y = -420*gear.scaleY*0.6;
 	var gear1_speed = 20000;
 	var gear2_speed = gear1_speed/(gear1.regX/gear2.regX);
 	var gear3_speed = gear2_speed/(gear2.regX/gear3.regX);
@@ -594,22 +616,103 @@ function singlemode(){
 	createjs.Tween.get(gear3,{loop:true}).to({rotation:360},gear3_speed);
 	createjs.Tween.get(gear4,{loop:true}).to({rotation:-360},gear4_speed);
 	createjs.Tween.get(gear5,{loop:true}).to({rotation:360},gear5_speed);
-	/* a = scrollbar(3,20,10,10,5);
-	mode_ui.addChild(a);  */
-	/* b = new dropdownlist(["随机随便干嘛","重口味","小清新"],300,500,2);
-	mode_ui.addChild(b); */
-	c = new switchbutton(300,400,2);
-	mode_ui.addChild(c);
+	//Draw gamesettings here
+	var gamesettings = new createjs.Container();
+	mode_ui.addChild(gamesettings);
+	gamesettings.regX = 330;
+	gamesettings.x = stage_width/2;
+	gamesettings.y = stage_height/6;
+	var gamesettingstext = "<?php echo trans('Gamesettings'); ?>";
+	var player_numtext = "<?php echo trans('Playernum'); ?>";
+	var gameclasstext = "<?php echo trans('Gameclass'); ?>";
+	var	gamesettings_text = new createjs.Text(gamesettingstext, "bold 60px 微软雅黑", "rgb(236,236,236)");
+	gamesettings.addChild(gamesettings_text);
+	gamesettings_text.x = 210;
+	var gamesettings_line_top = [];
+	for(i = 0 ;i <= 22; i++){
+		gamesettings_line_top[i] = new createjs.Shape();
+		gamesettings.addChild(gamesettings_line_top[i]);
+		gamesettings_line_top[i].graphics.beginFill("rgba(236,236,236,0.5)").drawPolyStar(30*i, 100, 10, 6, 0.5, -90);
+	}
+	var gamesettings_line_bottom = [];
+	for(i = 0 ;i <= 22; i++){
+		gamesettings_line_bottom[i] = new createjs.Shape();
+		gamesettings.addChild(gamesettings_line_bottom[i]);
+		gamesettings_line_bottom[i].graphics.beginFill("rgba(236,236,236,0.5)").drawPolyStar(30*i, 670, 10, 6, 0.5, -90);
+	}
+	//Draw play button here
+	var playbtn = new createjs.Bitmap(queue.getResult("playbutton"));
+	gamesettings.addChild(playbtn);
+	playbtn.scaleX = playbtn.scaleY = 340/160;
+	playbtn.x = 160;
+	playbtn.y = 710;
+	playbtn.addEventListener("click",function(){
+		main_ui.removeAllChildren();
+		var word = randomwords(gamesettings.gameclass);
+		singlestart(gamesettings_scrollbar.key_num,spy_text.text,blank_switchbutton.state,word);
+	});
+	//Draw playnum here
+	var player_num_text = new createjs.Text(player_numtext + "：", "bold 50px 微软雅黑 ", "rgb(324,117,110)");
+	gamesettings.addChild(player_num_text);
+	player_num_text.x = 20;
+	player_num_text.y = 165;
+	gamesettings_scrollbar = new scrollbar(3,12,370,140,1.5,function(key_num){
+		if(key_num <=7){
+			spy_text.text = 1;
+			civilian_text.text = key_num - spy_text.text;
+		}
+		else{
+			spy_text.text = 2;
+			civilian_text.text = key_num - spy_text.text;
+		}
+		gamesettings_scrollbar.key_num = key_num;
+		});
+	gamesettings.addChild(gamesettings_scrollbar);
+	//Draw civilian_num here
+	var civilian = new createjs.Text("<?php echo trans('FOLK'); ?>"+"x", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(civilian); 
+	civilian.x = 50;
+	civilian.y = 300;
+	var civilian_text = new createjs.Text(2, "bold 80px 微软雅黑", "rgb(237,175,114)");
+	gamesettings.addChild(civilian_text);
+	civilian_text.x = 190;
+	civilian_text.y = 280;
+	//Draw spy_num here
+	var spy = new createjs.Text("<?php echo trans('SPY'); ?>"+"x", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(spy); 
+	spy.x = 50;
+	spy.y = 410;
+	var spy_text = new createjs.Text(1, "bold 80px 微软雅黑", "rgb(237,175,114)");
+	gamesettings.addChild(spy_text);
+	spy_text.x = 190;
+	spy_text.y = 390;
+	//Draw blank here
+	var blank = new createjs.Text("<?php echo trans('BLANK'); ?>", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(blank);
+	blank.x = 340;
+	blank.y = 350;
+	var blank_switchbutton =new switchbutton(440,340,0.6,function(state){
+		if(state == 1){
+			civilian_text.text--;
+		}
+		else{
+			civilian_text.text++;
+		}
+	});
+	gamesettings.addChild(blank_switchbutton);
+	//Draw gameclass here
+	var gameclass_text = new createjs.Text(gameclasstext + "：", "bold 50px 微软雅黑 ", "rgb(150,206,203)");
+	gamesettings.addChild(gameclass_text);
+	gameclass_text.x = 20;
+	gameclass_text.y = 550;
+	gamesettings.gameclass = 0;
+	var gamesettings_dropdownlist = new dropdownlist(["重口味","小清新","随机"],310,520,1,function(choose){
+		gamesettings.gameclass = choose;
+	});
+	gamesettings.addChild(gamesettings_dropdownlist);
 	//ui animation
 	mode_ui.x = stage_width;
 	createjs.Tween.get(main_ui).to({x:-stage_width},500);
-/* 		createjs.Tween.get(mode_ui).to({x:0},500).call(function(){
-		main_ui.removeAllChildren();
-		calert("Done",function(){
-			wordssss=['辣椒','芥末'];
-			singlestart(10,2,1,wordssss);
-		});
-	}); */
 	createjs.Tween.get(mode_ui).to({x:0},500);
 }
 
