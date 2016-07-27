@@ -112,6 +112,9 @@ function init(){
 	//ui container for main page
 	main_ui = new createjs.Container();
 	stage.addChild(main_ui);
+	//Top ui grey mask
+	ui_mask = new createjs.Container();
+	stage.addChild(ui_mask);
 	//top UI, container for calert() cconfirm(), etc.
 	top_ui = new createjs.Container();
 	stage.addChild(top_ui);
@@ -121,6 +124,46 @@ function init(){
 	});
 	createjs.Ticker.setFPS(30);
 	createjs.Ticker.addEventListener("tick", stage);
+}
+
+//top mask manager class
+function top_mask(){
+	var _self = this;
+	if(!top_mask.nowid){
+		top_mask.nowid = 0;
+		top_mask.state = [];
+		top_mask.now = 0;
+	}
+	top_mask.state[top_mask.nowid] = 1;
+	if(!top_mask.now){
+		top_mask.now = 1;
+		var topmask = new createjs.Shape();
+		topmask.graphics.beginFill("rgba(0,0,0,0.5)").drawRect(0, 0,stage_width,stage_height);
+		ui_mask.addChild(topmask);
+		topmask.addEventListener("click",function(){});
+	}
+	top_mask.nowid++;
+	_self.removeMask = function(id){
+		top_mask.now = 0;
+		ui_mask.removeAllChildren();
+		if(typeof(id)!="undefined"){
+			top_mask.state = [];
+			top_mask.nowid = 0;
+		}else{
+			top_mask.state[_self.id] = 0;
+			$.each(top_mask.state,function(key,val){
+				if(val){
+					var topmask = new createjs.Shape();
+					topmask.graphics.beginFill("rgba(0,0,0,0.5)").drawRect(0, 0,stage_width,stage_height);
+					ui_mask.addChild(topmask);
+					topmask.addEventListener("click",function(){});
+					top_mask.now = 1;
+					return false;
+				}
+			});
+		}		
+	}
+	_self.id = top_mask.nowid-1;
 }
 
 //function used to play sound
@@ -142,6 +185,7 @@ function calert(info,callbackFunction,btntext){
 		calert.counter = 0;
 		calert.alertlist=[];
 	}
+	var calertmask = new top_mask();
 	calert.alertlist[calert.counter] = new createjs.Container();
 	top_ui.addChild(calert.alertlist[calert.counter]);
 	//Draw things here.
@@ -174,6 +218,7 @@ function calert(info,callbackFunction,btntext){
 	ok_btn.addChild(ok_btn_text);
 	ok_btn.addEventListener("click", function(evt) {
 		callbackFunction();
+		calertmask.removeMask();
 		play("paper2");
 		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
@@ -204,6 +249,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 		cconfirm.counter = 0;
 		cconfirm.alertlist=[];
 	}
+	var cconfirmmask = new top_mask();
 	cconfirm.alertlist[cconfirm.counter] = new createjs.Container();
 	top_ui.addChild(cconfirm.alertlist[cconfirm.counter]);
 	//Draw things here.
@@ -236,6 +282,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	ok_btn.addChild(ok_btn_text);
 	ok_btn.addEventListener("click", function(evt) {
 		callbackFunction(1);
+		cconfirmmask.removeMask();
 		play("paper2");
 		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
@@ -262,6 +309,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	cancel_btn.addChild(cancel_btn_text);
 	cancel_btn.addEventListener("click", function(evt) {
 		callbackFunction(0);
+		cconfirmmask.removeMask();
 		play("paper2");
 		createjs.Tween.get(evt.target.parent.parent).to({y:stage_height/2-50},100).to({alpha:0,y:stage_height/2+100},100).call(function(){
 			top_ui.removeChild(evt.target.parent.parent);
@@ -280,6 +328,7 @@ function cconfirm(info,callbackFunction,btnoktext,btncanceltext){
 	});
 	cconfirm.counter++;
 }
+
 //canvas scrollbar function
 function scrollbar(min_num, max_num,x,y,scale,onStateChange){
 	if(!onStateChange){
@@ -369,6 +418,7 @@ function scrollbar(min_num, max_num,x,y,scale,onStateChange){
 	});
 	return scrollbar_ui;
 }
+
 //canvas dropdownlist function
 function dropdownlist(item,x,y,scale,onStateChange){
 	if(!onStateChange){
@@ -426,6 +476,7 @@ function dropdownlist(item,x,y,scale,onStateChange){
 	}
 	return dplist;
 }
+
 //canvas switchbutton function
 function switchbutton(x,y,scale,onStateChange){
 	if(!onStateChange){
@@ -456,6 +507,7 @@ function switchbutton(x,y,scale,onStateChange){
 	});
 	return switchbtn;
 }
+
 //canvas randomwords function
 function randomwords(select){
 	var m;
@@ -476,6 +528,7 @@ function randomwords(select){
 	m = Math.floor(Math.random()*max + 1);
 	return words[n][m];
 }
+
 //canvas modeselect function
 function modeselect(){
 	var btnsingletext = "<?php echo trans('Single'); ?>";
@@ -1058,6 +1111,13 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 	});
 }
 
+//Network mode game start
+function netstart(roomid){
+	game_ui.removeAllChildren();
+	
+	
+}
+
 //function used in singlestart() used to take photo.
 function takephotos(num,callbackFunction,immjump,nownum,lastarray){
 	if(immjump){
@@ -1245,6 +1305,7 @@ function arrayselect(pickups,numbers){
 	return outputarr.sort();
 }
 
+//API connection function
 function netconn(TargetName,postData,callbackFunction){
 	$.ajax({
 		type: "POST",
@@ -1285,4 +1346,10 @@ function netconn(TargetName,postData,callbackFunction){
 		}
 	});
 }
+
+//net EventListener Class
+function netEventListener(netevent,callBackFunction,param){
+	
+}
+
 //Who will be the next?
