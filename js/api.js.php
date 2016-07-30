@@ -677,10 +677,11 @@ function singlemode(){
 	gamesettings.y = stage_height/6;
 	var gamesettingstext = "<?php echo trans('Gamesettings'); ?>";
 	var player_numtext = "<?php echo trans('Playernum'); ?>";
-	var gameclasstext = "<?php echo trans('Gameclass'); ?>";
+	var gameclasstext = "<?php echo trans('Word type'); ?>";
 	var	gamesettings_text = new createjs.Text(gamesettingstext, "bold 60px 微软雅黑", "rgb(236,236,236)");
 	gamesettings.addChild(gamesettings_text);
-	gamesettings_text.x = 210;
+	gamesettings_text.x = 330;
+	gamesettings_text.textAlign = "center";
 	var gamesettings_line_top = [];
 	for(i = 0 ;i <= 22; i++){
 		gamesettings_line_top[i] = new createjs.Shape();
@@ -771,7 +772,15 @@ function singlemode(){
 
 //Network mode main setting page
 function networkmode(){
-	calert("Developing,please wait..",0);
+	var tt = new pending("跳转至创房");
+	setTimeout(function(){
+		tt.clear();
+		netcreateroom();
+	},700);
+	setTimeout(function(){
+		tt.changeText("wait");
+	},500);
+	//calert("Developing,please wait..",0);
 }
 
 //Single mode game start
@@ -1111,6 +1120,158 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 	});
 }
 
+//netMode create room step
+function netcreateroom(){
+	//Draw a transparent mask on main_ui and give it click listener to block intractive from expired ui content
+	var main_block = new createjs.Shape();
+	main_block.alpha = 0;
+	main_block.graphics.beginFill("black").drawRect(0,0,stage_width,stage_height);
+	main_ui.addChild(main_block);
+	main_block.addEventListener("click",function(){/*This is a blackhole*/});
+	//Draw single mode ui here
+	var singlemode_ui = new createjs.Container();
+	mode_ui.addChild(singlemode_ui);
+	var singlemode_bg = new createjs.Bitmap(queue.getResult("singlemode_background"));
+	singlemode_ui.addChild(singlemode_bg);
+ 	singlemode_bg.scaleX = stage_width/500;
+	singlemode_bg.scaleY = stage_height/665;
+	singlemode_ui.alpha = 0;
+	createjs.Tween.get(singlemode_ui).to({alpha: 1},500).call(function(){}); 
+	var singlemode_bottom = new createjs.Bitmap(queue.getResult("singlemode_bottom"));
+	singlemode_ui.addChild(singlemode_bottom);
+	singlemode_bottom.scaleX = singlemode_bottom.scaleY = stage_width/1383*1.7;
+	singlemode_bottom.x = -0.35*stage_width;
+	singlemode_bottom.y = stage_height - 206*singlemode_bottom.scaleY;
+	//Draw gamesettings here
+	var gamesettings = new createjs.Container();
+	mode_ui.addChild(gamesettings);
+	gamesettings.regX = 330;
+	gamesettings.x = stage_width/2;
+	gamesettings.y = stage_height/12;
+	var gamesettingstext = "<?php echo trans('Room settings'); ?>";
+	var player_numtext = "<?php echo trans('Playernum'); ?>";
+	var gameclasstext = "<?php echo trans('Word type'); ?>";
+	var password = "";
+	var	gamesettings_text = new createjs.Text(gamesettingstext, "bold 60px 微软雅黑", "rgb(236,236,236)");
+	gamesettings.addChild(gamesettings_text);
+	gamesettings_text.x = 330;
+	gamesettings_text.textAlign = "center";
+	var gamesettings_line_top = [];
+	for(i = 0 ;i <= 22; i++){
+		gamesettings_line_top[i] = new createjs.Shape();
+		gamesettings.addChild(gamesettings_line_top[i]);
+		gamesettings_line_top[i].graphics.beginFill("rgba(236,236,236,0.5)").drawPolyStar(30*i, 100, 10, 6, 0.5, -90);
+	}
+	var gamesettings_line_bottom = [];
+	for(i = 0 ;i <= 22; i++){
+		gamesettings_line_bottom[i] = new createjs.Shape();
+		gamesettings.addChild(gamesettings_line_bottom[i]);
+		gamesettings_line_bottom[i].graphics.beginFill("rgba(236,236,236,0.5)").drawPolyStar(30*i, 770, 10, 6, 0.5, -90);
+	}
+	//Draw play button here
+	var playbtn = new createjs.Bitmap(queue.getResult("playbutton"));
+	gamesettings.addChild(playbtn);
+	playbtn.scaleX = playbtn.scaleY = 340/160;
+	playbtn.x = 160;
+	playbtn.y = 810;
+	playbtn.addEventListener("click",function(){
+		main_ui.removeAllChildren();
+		var word = randomwords(gamesettings.gameclass);
+		//singlestart(gamesettings_scrollbar.key_num,spy_text.text,blank_switchbutton.state,word);
+		var roompending = new pending("<?php echo trans('Creating Room'); ?>");
+		netconn("create_room",{"spynum":spy_text.text,"usernum":gamesettings_scrollbar.key_num,"whitenum":blank_switchbutton.state,"password":password,"words":word},function(r){
+			var roomid = r.roomid;
+			roompending.clear();
+			netstart(roomid);
+		})
+	});
+	//Draw playnum here
+	var player_num_text = new createjs.Text(player_numtext + "：", "bold 50px 微软雅黑 ", "rgb(324,117,110)");
+	gamesettings.addChild(player_num_text);
+	player_num_text.x = 20;
+	player_num_text.y = 165;
+	gamesettings_scrollbar = new scrollbar(3,12,370,140,1.5,function(key_num){
+		if(key_num <=7){
+			spy_text.text = 1;
+			civilian_text.text = key_num - spy_text.text;
+		}
+		else{
+			spy_text.text = 2;
+			civilian_text.text = key_num - spy_text.text;
+		}
+		gamesettings_scrollbar.key_num = key_num;
+		});
+	gamesettings.addChild(gamesettings_scrollbar);
+	//Draw civilian_num here
+	var civilian = new createjs.Text("<?php echo trans('FOLK'); ?>"+"x", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(civilian); 
+	civilian.x = 50;
+	civilian.y = 300;
+	var civilian_text = new createjs.Text(2, "bold 80px 微软雅黑", "rgb(237,175,114)");
+	gamesettings.addChild(civilian_text);
+	civilian_text.x = 190;
+	civilian_text.y = 280;
+	//Draw spy_num here
+	var spy = new createjs.Text("<?php echo trans('SPY'); ?>"+"x", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(spy); 
+	spy.x = 50;
+	spy.y = 410;
+	var spy_text = new createjs.Text(1, "bold 80px 微软雅黑", "rgb(237,175,114)");
+	gamesettings.addChild(spy_text);
+	spy_text.x = 190;
+	spy_text.y = 390;
+	//Draw blank here
+	var blank = new createjs.Text("<?php echo trans('BLANK'); ?>", "45px 微软雅黑", "rgb(232, 232, 255)" );
+	gamesettings.addChild(blank);
+	blank.x = 340;
+	blank.y = 350;
+	var blank_switchbutton =new switchbutton(440,340,0.6,function(state){
+		if(state == 1){
+			civilian_text.text--;
+		}
+		else{
+			civilian_text.text++;
+		}
+	});
+	gamesettings.addChild(blank_switchbutton);
+	//Draw gameclass here
+	var gameclass_text = new createjs.Text(gameclasstext + "：", "bold 50px 微软雅黑 ", "rgb(150,206,203)");
+	gamesettings.addChild(gameclass_text);
+	gameclass_text.x = 20;
+	gameclass_text.y = 550;
+	gamesettings.gameclass = 0;
+	var gamepass_text = new createjs.Text("<?php echo trans('Password'); ?>" + "：", "bold 50px 微软雅黑 ", "rgb(150,206,203)");
+	gamesettings.addChild(gamepass_text);
+	gamepass_text.x = 20;
+	gamepass_text.y = 650;
+	var pass_text = new createjs.Text("<?php echo trans('Unset'); ?>", "50px 微软雅黑 ", "rgb(150,206,203)");
+	gamesettings.addChild(pass_text);
+	pass_text.x = 300;
+	pass_text.y = 650;
+	var pass_hitarea = new createjs.Shape();
+	pass_hitarea.graphics.beginFill("rgba(0,0,0,0.01)").drawRect(300,650,pass_text.getMeasuredWidth()*1.5,70);
+	gamesettings.addChild(pass_hitarea);
+	pass_hitarea.addEventListener("click",function(){
+		var newpass = prompt("<?php echo trans('Set password'); ?> :",password);
+		if (newpass!=null && newpass!=""){
+			pass_text.text = "<?php echo trans('Setted'); ?>";
+			password = newpass;
+		}
+		if(newpass==""){
+			password = "";
+			pass_text.text = "<?php echo trans('Unset'); ?>";
+		}
+	});
+	var gamesettings_dropdownlist = new dropdownlist(["重口味","小清新","随机"],310,520,1,function(choose){
+		gamesettings.gameclass = choose;
+	});
+	gamesettings.addChild(gamesettings_dropdownlist);
+	//ui animation
+	mode_ui.x = stage_width;
+	createjs.Tween.get(main_ui).to({x:-stage_width},500);
+	createjs.Tween.get(mode_ui).to({x:0},500);
+}
+
 //Network mode game start
 function netstart(roomid){
 	game_ui.removeAllChildren();
@@ -1164,6 +1325,41 @@ function takephotos(num,callbackFunction,immjump,nownum,lastarray){
 		}else{
 			callbackFunction(lastarray);
 		}
+	}
+}
+
+//Pending Action
+function pending(showtext){
+	var _self = this;
+	var pendingmask = new top_mask();
+	var pendctn = new createjs.Container();
+	top_ui.addChild(pendctn);
+	var pendshape = new createjs.Shape();
+	pendshape.graphics.beginFill("rgba(0,0,0,0.5)").drawRoundRect(0,0,180,100,10);
+	pendctn.addChild(pendshape);
+	var pendtxt = new createjs.Text(showtext, "30px Arial", "#FFFFFF");
+	pendtxt.textBaseline = "top";
+	pendtxt.textAlign = "center";
+	pendtxt.x = 90;
+	pendtxt.y = 10;
+	pendctn.addChild(pendtxt);
+	var pendcirc = new createjs.Shape();
+	pendcirc.graphics.beginFill("rgb(72,145,227)").drawCircle(0,0,6);
+	pendctn.addChild(pendcirc);
+	pendcirc.x = 25;
+	pendcirc.y = 75;
+	createjs.Tween.get(pendcirc,{loop:true}).to({x:155},600,createjs.Ease.cubicInOut).to({x:25},600,createjs.Ease.cubicInOut);
+	pendctn.regX = 90;
+	pendctn.regY = 50;
+	pendctn.x = stage_width/2;
+	pendctn.y = stage_height/2;
+	pendctn.scaleY = pendctn.scaleX = Math.min(stage_width,stage_height)*0.4/140;
+	_self.clear = function(){
+		pendingmask.removeMask();
+		top_ui.removeChild(pendctn);
+	}
+	_self.changeText = function(text){
+		pendtxt.text = text;
 	}
 }
 
