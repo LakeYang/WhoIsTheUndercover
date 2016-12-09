@@ -1122,6 +1122,7 @@ function singlestart(player_num,spy_num,white_num,wordarr,restarted){
 
 //netMode create room step
 function netcreateroom(){
+	textpanel(1);
 	//Draw a transparent mask on main_ui and give it click listener to block intractive from expired ui content
 	var main_block = new createjs.Shape();
 	main_block.alpha = 0;
@@ -1274,9 +1275,48 @@ function netcreateroom(){
 
 //Network mode game start
 function netstart(roomid){
+	netstart.roomid = roomid;
 	game_ui.removeAllChildren();
-	
-	
+	//Draw a transparent mask on main_ui and give it click listener to block intractive from expired ui content
+	var main_block = new createjs.Shape();
+	main_block.alpha = 0;
+	main_block.graphics.beginFill("black").drawRect(0, 0, stage_width, stage_height);
+	main_ui.addChild(main_block);
+	main_block.addEventListener("click",function(){/*This is a blackhole*/});
+	var ctn_back = new createjs.Bitmap(queue.getResult("modeselect_background"));
+	ctn_back.scaleX = stage_width/360;
+	ctn_back.scaleY = stage_height/640;
+	game_ui.addChild(ctn_back);
+	createjs.Tween.get(game_ui).to({x:0},500);
+	createjs.Tween.get(mode_ui).to({x:-stage_width},500).call(function(){
+		mode_ui.removeAllChildren();
+		mode_ui.x = 0;
+		
+		
+	});
+}
+
+//Open texting panel
+function textpanel(state){
+	if(typeof(state)==undefined){
+		var state = 1;
+	}
+	if(state){
+		$("body").append('<input class="inputstyle" type="text" name="chatfield" id="chatfield" style="position:fixed; left:15px; bottom:15px; width:'+($(window).width()-110)+'px; height:50px; font-size:40px">');
+		$("body").append('<input class="subbtnstyle" type="button" onclick="textpanelsend()" name="submit" id="submit" value="<?php echo trans('Send'); ?>" style="position:fixed; right:15px; bottom:15px; height:50px; width:75px">');
+	}else{
+		$("#chatfield").remove();
+		$("#submit").remove();
+	}
+}
+
+//As the name said
+function textpanelsend(){
+	$("#chatfield").blur();
+	netconn("send_message",{"roomid":netstart.roomid,"message":$("#chatfield").val()},function(){
+		
+	});
+	textpanel(0);
 }
 
 //function used in singlestart() used to take photo.
